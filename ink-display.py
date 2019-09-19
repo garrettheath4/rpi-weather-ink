@@ -15,32 +15,40 @@ padding = 0
 
 def main():
     inky_display = InkyPHAT(COLOR)
+    display_size = (inky_display.WIDTH, inky_display.HEIGHT)
 
     # inky_display.set_rotation(180)
     inky_display.set_border(inky_display.RED)
 
-    img = Image.new("P", (inky_display.WIDTH, inky_display.HEIGHT))
+    img = Image.new("P", display_size)
     draw = ImageDraw.Draw(img)
 
-    #TODO: Draw background (white?)
+    # TODO: Draw background (white?)
 
-    draw_text(str(get_uv()), inky_display.BLACK, 2, draw, inky_display.WIDTH)
-    draw_text(str(get_cloudiness()), inky_display.BLACK, 3, draw, inky_display.WIDTH)
-    draw_text(str(get_high_temp()), inky_display.BLACK, 1, draw, inky_display.WIDTH)
-    draw_text(str(get_low_temp()), inky_display.BLACK, 4, draw, inky_display.WIDTH)
+    draw_text(str(get_uv()),         inky_display.BLACK, 2, draw, display_size)
+    draw_text(str(get_cloudiness()), inky_display.BLACK, 3, draw, display_size)
+    draw_text(str(get_high_temp()),  inky_display.BLACK, 1, draw, display_size)
+    draw_text(str(get_low_temp()),   inky_display.BLACK, 4, draw, display_size)
+
+    inky_display.set_image(img)
+    inky_display.show()
 
 
-def draw_text(text, font_color, quadrant, draw, display_width):
-    intuitive_font = ImageFont.truetype(Intuitive, int(22 * scale_size))
-    hanken_bold_font = ImageFont.truetype(HankenGroteskBold, int(35 * scale_size))
+def draw_text(text, font_color, quadrant, draw, display_size):
+    # intuitive_font = ImageFont.truetype(Intuitive, int(22 * scale_size))
+    # hanken_bold_font = ImageFont.truetype(HankenGroteskBold, int(35 * scale_size))
     hanken_medium_font = ImageFont.truetype(HankenGroteskMedium, int(16 * scale_size))
 
-    # UV Index
-    uv_int = get_uv()
-    uv_w, uv_h = hanken_medium_font.getsize(str(uv_int))
-    uv_x = int((display_width - uv_w) / 2)
-    uv_y = 0 + padding
-    draw.text((uv_x, uv_y), str(uv_int), font_color, font=hanken_medium_font)
+    display_width, display_height = display_size
+
+    text_w, text_h = hanken_medium_font.getsize(str(text))
+    text_x = int(((display_width / 2) - text_w) / 2)
+    if quadrant in (1, 4):
+        text_x += display_width / 2
+    text_y = 0 + padding
+    if quadrant in (3, 4):
+        text_y += display_height
+    draw.text((text_x, text_y), str(text), font_color, font=hanken_medium_font)
 
 
 def get_uv():
