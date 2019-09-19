@@ -47,7 +47,7 @@ def draw_text(text, font_color, quadrant, draw, display_size):
         text_x += display_width / 2
     text_y = 0 + padding
     if quadrant in (3, 4):
-        text_y += display_height
+        text_y += display_height / 2
     draw.text((text_x, text_y), str(text), font_color, font=hanken_medium_font)
 
 
