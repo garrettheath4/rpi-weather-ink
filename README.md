@@ -10,6 +10,14 @@ up-to-date weather forecast including the UV index of the day.
 +----------|----------+
 ```
 
+## Getting Started
+
+Just run the `ink-display.py` script to refresh the e-ink display.
+
+```
+./ink-display.py
+```
+
 ## Hardware
 
 * Raspberry Pi Zero WH (Zero W with Headers)
