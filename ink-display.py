@@ -27,9 +27,14 @@ def main():
     draw = ImageDraw.Draw(img)
 
     # TODO: Draw background (white?)
-    for y in range(inky_display.height - 4, inky_display.height):
-        for x in range(inky_display.width, inky_display.width):
-            img.putpixel((x, y), inky_display.RED)
+
+    # Draw vertical line
+    for y in range(0, inky_display.height):
+        img.putpixel((inky_display.width / 2, y), inky_display.BLACK)
+
+    # Draw horizontal line
+    for x in range(0, inky_display.width):
+        img.putpixel((x, inky_display.height / 2), inky_display.BLACK)
 
     draw_text(get_uv(),             inky_display.BLACK, 2, img, display_size)
     draw_text(get_cloudiness(),     inky_display.BLACK, 3, img, display_size)
@@ -63,6 +68,7 @@ def draw_text(text, font_color, quadrant, image, display_size):
     text_y = int(max((display_height / 2) - font_height, 0) / 2)
     if quadrant in (3, 4):
         text_y += display_height / 2
+
     ImageDraw.Draw(image).text((text_x, text_y), text_str, font_color, font=hanken_medium_font)
 
 
@@ -71,6 +77,7 @@ def get_uv():
 
 
 def get_cloudiness():
+    # TODO: Draw a sun, cloud, or rain instead of words
     return random.choice([u"Sunny", u"Cloudy"])
 
 
