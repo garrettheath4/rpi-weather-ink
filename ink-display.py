@@ -9,20 +9,38 @@ try:
 except ImportError:
     exit("This script requires PIL/Pillow to be installed\nInstall it with: sudo apt install python-pil")
 
+# Fonts
 try:
     from font_hanken_grotesk import HankenGroteskBold, HankenGroteskMedium
 except ImportError:
     exit("This script requires the font_hanken_grotesk module\nInstall it with pipenv install --system")
-
 try:
     from font_intuitive import Intuitive
 except ImportError:
     exit("This script requires the font_intuitive module\nInstall it with pipenv install --system")
 
+# Transitive dependencies of Inky library
+try:
+    import spidev
+except ImportError:
+    print("The inky library probably requires the spidev module\nIf this script fails, install spidev with pipenv install --system")
+try:
+    import smbus2
+except ImportError:
+    print("The inky library probably requires the smbus2 module\nIf this script fails, install smbus2 with pipenv install --system")
+try:
+    import RPi.GPIO
+except ImportError:
+    print("The inky library probably requires the RPi.GPIO module\nIf this script fails, install RPi.GPIO with sudo apt install python-rpi.gpio")
+try:
+    import numpy
+except ImportError:
+    print("The inky library probably requires the numpy module\nIf this script fails, install numpy with sudo apt install python-numpy")
+
 try:
     from inky import InkyPHAT, InkyWHAT
 except ImportError:
-    exit("This script requires the inky module\nInstall it with pipenv install --system")
+    exit("This script requires the inky module\nInstall it with sudo pip install inky")
 
 fa_filename = "Font Awesome 5 Free-Solid-900.otf"
 
