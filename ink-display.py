@@ -24,6 +24,8 @@ try:
 except ImportError:
     exit("This script requires the inky module\nInstall it with pipenv install --system")
 
+fa_filename = "Font Awesome 5 Free-Solid-900.otf"
+
 # phat-specific (as opposed to what-specific)
 COLOR = "yellow"
 font_size = 38
@@ -40,8 +42,6 @@ def main():
 
     img = Image.new("P", display_size)
     draw = ImageDraw.Draw(img)
-
-    # TODO: Draw background (white?)
 
     # Draw vertical line
     for y in range(0, inky_display.height):
@@ -66,7 +66,7 @@ def draw_text(text, quadrant, image, display_size, font_awesome=False):
     # hanken_medium_font = ImageFont.truetype(HankenGroteskMedium, int(font_size * scale_size))
 
     if font_awesome:
-        draw_font = ImageFont.truetype('Font Awesome 5 Free-Regular-400.otf', int(font_size * scale_size))
+        draw_font = ImageFont.truetype(fa_filename, int(font_size * scale_size))
     else:
         draw_font = ImageFont.truetype(HankenGroteskMedium, int(font_size * scale_size))
 
@@ -97,7 +97,6 @@ def get_uv():
 
 
 def get_cloudiness(font_awesome=False):
-    # TODO: Draw a sun, cloud, or rain instead of words
     if font_awesome:
         return random.choice([u"\uf185", u"\uf0c2"])
     else:
