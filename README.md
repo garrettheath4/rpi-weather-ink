@@ -10,11 +10,19 @@ up-to-date weather forecast including the UV index of the day.
 +----------|----------+
 ```
 
-## Getting Started
+## Installation
+
+```
+cd rpi-weather-ink/
+python setup.py install
+```
+
+## Running
 
 Just run the `ink-display.py` script to refresh the e-ink display.
 
 ```
+cd rpi-weather-ink/
 ./ink-display.py
 ```
 
