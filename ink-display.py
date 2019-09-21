@@ -104,7 +104,7 @@ def get_cloudiness(font_awesome=False):
             u"\uf73d",  # cloud-rain
         ])
     else:
-        return random.choice([u"Sunny", u"Cloudy"])
+        return random.choice([u"Sunny", u"Cloudy", u"Rain"])
 
 
 def get_high_temp():
