@@ -98,7 +98,11 @@ def get_uv():
 
 def get_cloudiness(font_awesome=False):
     if font_awesome:
-        return random.choice([u"\uf185", u"\uf0c2"])
+        return random.choice([
+            u"\uf185",  # sun
+            u"\uf0c2",  # cloud
+            u"\uf73d",  # cloud-rain
+        ])
     else:
         return random.choice([u"Sunny", u"Cloudy"])
 
