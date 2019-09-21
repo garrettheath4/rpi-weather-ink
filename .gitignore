@@ -1,5 +1,7 @@
+# Vim
 *~
-env/
-venv/
+.*.swp
+
+# IntelliJ IDEA
 *.iml
 .idea/
