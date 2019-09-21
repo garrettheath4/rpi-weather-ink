@@ -35,7 +35,7 @@ cd rpi-weather-ink/
 ```
 sudo pip install pipenv
 pipenv install <python-package>
-pipenv run python ink-dislpay.py
+pipenv run python ink-display.py
 pipenv lock -r > requirements.txt
 sudo pip install -r requirements.txt
 ```
@@ -51,8 +51,8 @@ directory.
 
 ```
 sudo apt install python-pil
-mkdir ~/.local/share/virtualenvs/rpi-weather-ink-*/lib/python2.7/dist-packages
-ln -s /usr/lib/python2.7/dist-packages/PIL ~/.local/share/virtualenvs/rpi-weather-ink-*/lib/python2.7/dist-packages/PIL
+mkdir ~/.local/share/virtualenvs/rpi-weather-ink-T1XSpv21/lib/python2.7/dist-packages
+ln -s /usr/lib/python2.7/dist-packages/PIL ~/.local/share/virtualenvs/rpi-weather-ink-T1XSpv21/lib/python2.7/dist-packages/PIL
 ```
 
 ## Hardware
