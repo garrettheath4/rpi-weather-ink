@@ -51,24 +51,29 @@ def main():
     for x in range(0, inky_display.width):
         img.putpixel((x, inky_display.height / 2), inky_display.BLACK)
 
-    draw_text(get_uv(),             inky_display.BLACK, 2, img, display_size)
-    draw_text(get_cloudiness(),     inky_display.BLACK, 3, img, display_size)
-    draw_text(get_high_temp_copy(), inky_display.BLACK, 1, img, display_size)
-    draw_text(get_low_temp_copy(),  inky_display.BLACK, 4, img, display_size)
+    draw_text(get_uv(),             2, img, display_size)
+    draw_text(get_cloudiness(True), 3, img, display_size, font_awesome=True)
+    draw_text(get_high_temp_copy(), 1, img, display_size)
+    draw_text(get_low_temp_copy(),  4, img, display_size)
 
     inky_display.set_image(img)
     inky_display.show()
 
 
-def draw_text(text, font_color, quadrant, image, display_size):
+def draw_text(text, quadrant, image, display_size, font_awesome=False):
     # intuitive_font = ImageFont.truetype(Intuitive, int(22 * scale_size))
     # hanken_bold_font = ImageFont.truetype(HankenGroteskBold, int(35 * scale_size))
-    hanken_medium_font = ImageFont.truetype(HankenGroteskMedium, int(font_size * scale_size))
+    # hanken_medium_font = ImageFont.truetype(HankenGroteskMedium, int(font_size * scale_size))
+
+    if font_awesome:
+        draw_font = ImageFont.truetype('Font Awesome 5 Free-Regular-400.otf', int(font_size * scale_size))
+    else:
+        draw_font = ImageFont.truetype(HankenGroteskMedium, int(font_size * scale_size))
 
     # Ensure baselines line up by always calculating font height including cap
     # line height and descender line height (i.e. vertically align "ab" as if it
     # were as high as "Ay")
-    _, font_height = hanken_medium_font.getsize("Ay")
+    _, font_height = draw_font.getsize("Ay")
 
     display_width, display_height = display_size
 
@@ -76,7 +81,7 @@ def draw_text(text, font_color, quadrant, image, display_size):
     if type(text) not in (unicode, str):
         text_str = str(text)
 
-    text_w, text_h = hanken_medium_font.getsize(text_str)
+    text_w, text_h = draw_font.getsize(text_str)
     text_x = int(max((display_width / 2) - text_w, 0) / 2)
     if quadrant in (1, 4):
         text_x += display_width / 2
@@ -84,16 +89,19 @@ def draw_text(text, font_color, quadrant, image, display_size):
     if quadrant in (3, 4):
         text_y += display_height / 2
 
-    ImageDraw.Draw(image).text((text_x, text_y), text_str, font_color, font=hanken_medium_font)
+    ImageDraw.Draw(image).text((text_x, text_y), text_str, InkyPHAT.BLACK, font=draw_font)
 
 
 def get_uv():
     return random.randint(3, 9)
 
 
-def get_cloudiness():
+def get_cloudiness(font_awesome=False):
     # TODO: Draw a sun, cloud, or rain instead of words
-    return random.choice([u"Sunny", u"Cloudy"])
+    if font_awesome:
+        return random.choice([u"\uf185", u"\uf0c2"])
+    else:
+        return random.choice([u"Sunny", u"Cloudy"])
 
 
 def get_high_temp():
