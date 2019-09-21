@@ -4,10 +4,25 @@
 import argparse
 import random
 
-from PIL import Image, ImageFont, ImageDraw
-from font_hanken_grotesk import HankenGroteskBold, HankenGroteskMedium
-from font_intuitive import Intuitive
-from inky import InkyPHAT, InkyWHAT
+try:
+    from PIL import Image, ImageFont, ImageDraw
+except ImportError:
+    exit("This script requires PIL/Pillow to be installed\nInstall it with: sudo apt install python-pil")
+
+try:
+    from font_hanken_grotesk import HankenGroteskBold, HankenGroteskMedium
+except ImportError:
+    exit("This script requires the font_hanken_grotesk module\nInstall it with pipenv install --system")
+
+try:
+    from font_intuitive import Intuitive
+except ImportError:
+    exit("This script requires the font_intuitive module\nInstall it with pipenv install --system")
+
+try:
+    from inky import InkyPHAT, InkyWHAT
+except ImportError:
+    exit("This script requires the inky module\nInstall it with pipenv install --system")
 
 # phat-specific (as opposed to what-specific)
 COLOR = "yellow"
