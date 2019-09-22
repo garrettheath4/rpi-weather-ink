@@ -76,7 +76,7 @@ def run():
     draw_text(get_high_temp_copy(weather), 1, img, display_size)
     draw_text(get_low_temp_copy(weather),  4, img, display_size)
 
-    if weather.uv_index > 5:
+    if weather.is_uv_warning():
         ImageDraw.Draw(img).text(radiation_location, radiation_icon, InkyPHAT.YELLOW, font=icons_font)
 
     # TODO: Show the chance of precipitation next to the sky icon

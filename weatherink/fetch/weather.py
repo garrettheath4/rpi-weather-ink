@@ -24,10 +24,11 @@ except ImportError:
 
 
 class Weather:
-    def __init__(self, coords, query_api=True):
+    def __init__(self, coords, query_api=True, uv_warning_threshold=6):
         self.coords = coords
         self._coords_str = ",".join([str(c) for c in coords])
         self.query_api = query_api
+        self._uv_warning_threshold = uv_warning_threshold
 
         # Create fields for weather data
         self.summary_key = None
@@ -86,3 +87,6 @@ class Weather:
                                     .text)
             else:
                 raise Exception("UI request returned a not-OK status code", res.status_code, res.url)
+
+    def is_uv_warning(self):
+        return self.uv_index >= self._uv_warning_threshold

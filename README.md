@@ -10,6 +10,7 @@ up-to-date weather forecast including the UV index of the day.
 +----------|----------+
 ```
 
+
 ## Installation
 
 ```
@@ -28,6 +29,7 @@ formatted like this:
 api-key = 1234567890abcdef0123456789ABCDEF
 ```
 
+
 ## Running
 
 ### Run Once
@@ -41,12 +43,33 @@ python -m weatherink
 
 ### Run Automatically
 
-Run `crontab -e` and insert the following line into your crontab file to
-refresh the screen every 5 minutes.
+Run `crontab -e` and insert the following line into your crontab file to refresh
+the screen every 5 minutes.
 
 ```
 */5 * * * * cd $HOME/rpi-weather-ink/ && ( git pull -q ; python -m weatherink )
 ```
+
+
+## Features
+
+- Fetches weather forecast data from [Dark Sky API](https://darksky.net/dev)
+- Displays weather data on e-ink display
+    - UV index
+    - Sky forecast icon (e.g. sunny or cloudy)
+    - High and low temperatures for the day
+- Uses [Font Awesome 5 Free](https://fontawesome.com) for icons
+- Uses [Ubuntu](https://design.ubuntu.com/font/) open-source font for text
+- Displays warning icon if daily UV index is high (6 or higher by default)
+- Refreshes weather data every 5 minutes
+
+
+## Future Work
+
+- [ ] Only re-render e-ink screen if data has changed since previous render
+- [ ] Improve graphic design on screen
+- [ ] Show graph of forecasted rainfall in the next few minutes and hours
+
 
 ## Development
 
@@ -90,3 +113,4 @@ successful method listed below, in order:
 * Adafruit Raspberry Pi Zero Case
 * USB On-the-Go Cable (Micro-USB male to USB A female)
 * Mini HDMI to HDMI Cable
+
