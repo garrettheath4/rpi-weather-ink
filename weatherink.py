@@ -85,7 +85,6 @@ def main():
     inky_display.set_border(inky_display.RED)
 
     img = Image.new("P", display_size)
-    draw = ImageDraw.Draw(img)
 
     # Draw vertical line
     for y in range(0, inky_display.height):
@@ -181,7 +180,7 @@ class Weather:
         if api_key:
             # exclude=currently,minutely,hourly,daily,alerts,flags
             res = requests.get("https://api.darksky.net/forecast/{}/{}?exclude=minutely,hourly,alerts,flags"
-                    .format(api_key, coords_str))
+                               .format(api_key, coords_str))
             if res.status_code == 200:
                 res_json = json.loads(res.content)
                 self.weather["summary-key"] = res_json["daily"]["icon"]
@@ -235,7 +234,7 @@ def get_api_key_from_config():
     config.read('secrets.ini')
     try:
         return config.get("DarkSky", "api-key")
-    except (ConfigParser.NoSectionError, ConfigParser.NoOptionError) as e:
+    except (ConfigParser.NoSectionError, ConfigParser.NoOptionError):
         return None
 
 
