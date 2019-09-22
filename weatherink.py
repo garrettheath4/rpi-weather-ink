@@ -162,10 +162,17 @@ def get_weather():
     res = requests.get("https://darksky.net/forecast/{}/us12/en".format(",".join([str(c) for c in location_coords])))
     if res.status_code == 200:
         soup = BeautifulSoup(res.content, "lxml")
-        curr = soup.find_all("span", "currently")
-        weather["summary"] = curr[0].img["alt"].split()[0]
-        weather["temperature"] = int(curr[0].find("span", "summary").text.split()[0][:-1])
-        weather["uv"] = int(curr[0].find("span", "uv_index").text.split()[0][:-1])
+        curr = soup.find("span", "currently")
+        weather["summary"] = curr.img["alt"].split()[0]
+        weather["current-temp"] = int(curr.find("span", "summary").text.split()[0][:-1])
+        high_low = curr.find("span", { "class": "summary-high-low" })
+        weather["feels-like"] = int(high_low.find("span", { "class": "feels-like-text" }).text[:-1])
+        weather["low-temp"]   = int(high_low.find("span", { "class": "low-temp-text" }).text[:-1])
+        weather["high-temp"]  = int(high_low.find("span", { "class": "high-temp-text" }).text[:-1])
+        weather["uv"] = int(soup.find(id="currentDetails") \
+            .find("div", { "class": "uv_index" }) \
+            .find("span", { "class": "uv__index__value" }) \
+            .text)
         return weather
     else:
         return weather
