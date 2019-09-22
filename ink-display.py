@@ -47,6 +47,11 @@ try:
 except ImportError:
     exit("This script requires the requests module\nInstall it with pipenv install --system")
 
+try:
+    from bs4 import BeautifulSoup
+except ImportError:
+    exit("This script requires the BeautifulSoup module\nInstall it with pipenv install --system")
+
 fa_filename = "Font Awesome 5 Free-Solid-900.otf"
 
 # phat-specific (as opposed to what-specific)

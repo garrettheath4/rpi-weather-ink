@@ -11,6 +11,7 @@ font-intuitive = "*"
 spidev = "*"
 smbus2 = "*"
 requests = "*"
+beautifulsoup4 = "*"
 
 [requires]
 python_version = "2.7"
