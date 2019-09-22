@@ -67,6 +67,9 @@ the screen every 5 minutes.
 ## Future Work
 
 - [ ] Only re-render e-ink screen if data has changed since previous render
+- [ ] Show sunglasses icon if it's sunny _right now_ (current UV index is high
+      instead of daily UV index)
+- [ ] Show chance of precipitation next to the sky icon
 - [ ] Improve graphic design on screen
 - [ ] Show graph of forecasted rainfall in the next few minutes and hours
 

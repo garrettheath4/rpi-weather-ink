@@ -69,8 +69,6 @@ def run():
     image_draw = ImageDraw.Draw(img)
 
     weather = Weather(location_coords)
-    # TODO: Only update the display if the data has changed since the last refresh
-    # (Use a temporary file to save the data for the most recent screen draw)
 
     draw_text(weather.uv_index,            2, image_draw, display_size)
     draw_text(get_sky_icon(weather),       3, image_draw, display_size, use_icon_font=True)
@@ -79,8 +77,6 @@ def run():
 
     if weather.is_uv_warning():
         image_draw.text(radiation_location, radiation_icon, InkyPHAT.YELLOW, font=icons_font)
-
-    # TODO: Show the chance of precipitation next to the sky icon
 
     inky_display.set_image(img)
     inky_display.show()
