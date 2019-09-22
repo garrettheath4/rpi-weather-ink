@@ -42,6 +42,11 @@ try:
 except ImportError:
     exit("This script requires the inky module\nInstall it with sudo pip install inky")
 
+try:
+    import requests
+except ImportError:
+    exit("This script requires the requests module\nInstall it with pipenv install --system")
+
 fa_filename = "Font Awesome 5 Free-Solid-900.otf"
 
 # phat-specific (as opposed to what-specific)
