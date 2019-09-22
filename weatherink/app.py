@@ -1,60 +1,41 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import ConfigParser
-import json
-
 try:
     from PIL import Image, ImageFont, ImageDraw
 except ImportError:
     Image, ImageFont, ImageDraw = None, None, None
-    exit("This script requires PIL/Pillow to be installed\nInstall it with: sudo apt install python-pil")
+    exit("This package requires PIL/Pillow to be installed\nInstall it with: sudo apt install python-pil")
 
 # Transitive dependencies of Inky library
 try:
     import spidev
 except ImportError:
     print("The inky library probably requires the spidev module\n"
-          + "If this script fails, install spidev with pipenv install --system")
+          + "If this package fails to run, install spidev with pipenv install --system")
 try:
     import smbus2
 except ImportError:
     print("The inky library probably requires the smbus2 module\n"
-          + "If this script fails, install smbus2 with pipenv install --system")
+          + "If this package fails to run, install smbus2 with pipenv install --system")
 try:
     import RPi.GPIO
 except ImportError:
     print("The inky library probably requires the RPi.GPIO module\n"
-          + "If this script fails, install RPi.GPIO with sudo apt install python-rpi.gpio")
+          + "If this package fails to run, install RPi.GPIO with sudo apt install python-rpi.gpio")
 try:
     import numpy
 except ImportError:
     print("The inky library probably requires the numpy module\n"
-          + "If this script fails, install numpy with sudo apt install python-numpy")
+          + "If this package fails to run, install numpy with sudo apt install python-numpy")
 
 try:
     from inky import InkyPHAT
 except ImportError:
     from tests.mock import InkyPHAT
-    exit("This script requires the inky module\nInstall it with sudo pip install inky")
+    exit("This package requires the inky module\nInstall it with sudo pip install inky")
 
-try:
-    import requests
-except ImportError:
-    requests = None
-    exit("This script requires the requests module\nInstall it with pipenv install --system")
-
-try:
-    from bs4 import BeautifulSoup
-except ImportError:
-    from tests.mock import BeautifulSoup
-    exit("This script requires the BeautifulSoup module\nInstall it with pipenv install --system")
-
-try:
-    import lxml
-except ImportError:
-    print("The BeautifulSoup library probably requires the lxml module\n"
-          + "If this script fails, install lxml with sudo apt install python-lxml")
+from weatherink.fetch.weather import Weather
 
 location_coords = [38.928766, -77.032645]
 text_font_filename = "resources/Ubuntu-Regular.ttf"
@@ -86,7 +67,7 @@ def run():
 
     img = Image.new("P", display_size)
 
-    weather = Weather(location_coords, get_api_key_from_config())
+    weather = Weather(location_coords)
     # TODO: Only update the display if the data has changed since the last refresh
     # (Use a temporary file to save the data for the most recent screen draw)
 
@@ -170,59 +151,6 @@ def get_high_temp_copy(weather):
 
 def get_low_temp_copy(weather):
     return str(weather.low_temp) + temp_unit
-
-
-class Weather:
-    def __init__(self, coords, api_key=None):
-        self.coords = coords
-        self._coords_str = ",".join([str(c) for c in coords])
-        self.summary_key = None
-        self.current_temp = None
-        self.feels_like = None
-        self.low_temp = None
-        self.high_temp = None
-        self.uv_index = None
-        if api_key:
-            # exclude=currently,minutely,hourly,daily,alerts,flags
-            res = requests.get("https://api.darksky.net/forecast/{}/{}?exclude=minutely,hourly,alerts,flags"
-                               .format(api_key, self._coords_str))
-            if res.status_code == 200:
-                res_json = json.loads(res.content)
-                self.summary_key = res_json["daily"]["icon"]
-                self.current_temp = int(round(res_json["currently"]["temperature"]))
-                self.feels_like = int(round(res_json["currently"]["apparentTemperature"]))
-                self.low_temp = int(round(res_json["daily"]["data"][0]["temperatureLow"]))
-                self.high_temp = int(round(res_json["daily"]["data"][0]["temperatureHigh"]))
-                self.uv_index = int(res_json["daily"]["data"][0]["uvIndex"])
-            else:
-                raise Exception("API request returned a not-OK status code", res.status_code, res.url)
-        else:
-            print("Info: Fetching data from current forecast page instead of API since no API key was given")
-            res = requests.get("https://darksky.net/forecast/{}/us12/en".format(self._coords_str))
-            if res.status_code == 200:
-                soup = BeautifulSoup(res.content, "lxml")
-                curr = soup.find("span", "currently")
-                self.summary_key = curr.img["alt"].split()[0]
-                self.current_temp = int(curr.find("span", "summary").text.split()[0][:-1])
-                high_low = curr.find("span", {"class": "summary-high-low"})
-                self.feels_like = int(high_low.find("span", {"class": "feels-like-text"}).text[:-1])
-                self.low_temp = int(high_low.find("span", {"class": "low-temp-text"}).text[:-1])
-                self.high_temp = int(high_low.find("span", {"class": "high-temp-text"}).text[:-1])
-                self.uv_index = int(soup.find(id="currentDetails")
-                                    .find("div", {"class": "uv_index"})
-                                    .find("span", {"class": "uv__index__value"})
-                                    .text)
-            else:
-                raise Exception("UI request returned a not-OK status code", res.status_code, res.url)
-
-
-def get_api_key_from_config():
-    config = ConfigParser.RawConfigParser()
-    config.read('secrets.ini')
-    try:
-        return config.get("DarkSky", "api-key")
-    except (ConfigParser.NoSectionError, ConfigParser.NoOptionError):
-        return None
 
 
 if __name__ == "__main__":
