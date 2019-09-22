@@ -19,9 +19,9 @@ pipenv install --system
 ```
 
 If you want to use the Dark Sky API to fetch more accurate forecast data, you'll
-need to put the Dark Sky API key in a `secrets.ini` file in the main folder of
-this project (the `rpi-weather-ink/` directory). The file should be formatted
-like this:
+need to put the Dark Sky API key in a `secrets.ini` file in the `resources/`
+folder of this project (the `rpi-weather-ink/` directory). The file should be
+formatted like this:
 
 ```
 [DarkSky]

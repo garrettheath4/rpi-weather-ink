@@ -46,7 +46,7 @@ class Weather:
     @staticmethod
     def get_api_key_from_config():
         config = ConfigParser.RawConfigParser()
-        config.read("secrets.ini")
+        config.read("resources/secrets.ini")
         try:
             return config.get("DarkSky", "api-key")
         except (ConfigParser.NoSectionError, ConfigParser.NoOptionError):
