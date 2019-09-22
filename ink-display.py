@@ -52,6 +52,7 @@ try:
 except ImportError:
     exit("This script requires the BeautifulSoup module\nInstall it with pipenv install --system")
 
+location_coords = [38.928766, -77.032645]
 fa_filename = "Font Awesome 5 Free-Solid-900.otf"
 
 # phat-specific (as opposed to what-specific)
@@ -149,6 +150,20 @@ def get_low_temp():
 
 def get_low_temp_copy():
     return str(get_low_temp()) + temp_unit
+
+
+def get_weather():
+    weather = {}
+    res = requests.get("https://darksky.net/forecast/{}/us12/en".format(",".join([str(c) for c in location_coords])))
+    if res.status_code == 200:
+        soup = BeautifulSoup(res.content, "lxml")
+        curr = soup.find_all("span", "currently")
+        weather["summary"] = curr[0].img["alt"].split()[0]
+        weather["temperature"] = int(curr[0].find("span", "summary").text.split()[0][:-1])
+        weather["uv"] = int(curr[0].find("span", "uv_index").text.split()[0][:-1])
+        return weather
+    else:
+        return weather
 
 
 if __name__ == "__main__":
