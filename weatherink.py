@@ -96,12 +96,12 @@ def main():
     # TODO: Only update the display if the data has changed since the last refresh
     # (Use a temporary file to save the data for the most recent screen draw)
 
-    draw_text(weather.uv_index_int(),      2, img, display_size)
+    draw_text(weather.uv_index,      2, img, display_size)
     draw_text(get_sky_icon(weather),       3, img, display_size, font_awesome=True)
     draw_text(get_high_temp_copy(weather), 1, img, display_size)
     draw_text(get_low_temp_copy(weather),  4, img, display_size)
 
-    if weather.uv_index_int() > 5:
+    if weather.uv_index > 5:
         ImageDraw.Draw(img).text(radiation_location, radiation_icon, InkyPHAT.YELLOW, font=fontawesome_font)
 
     # TODO: Show the chance of precipitation next to the sky icon
@@ -163,74 +163,62 @@ def get_sky_icon(weather):
                 "wind": wind_icon,
                 "fog": smog_icon,
             }
-    if weather.summary_key_str() in icons:
-        return icons[weather.summary_key_str()]
+    if weather.summary_key in icons:
+        return icons[weather.summary_key]
     else:
         return question_icon
 
 
 def get_high_temp_copy(weather):
-    return str(weather.high_temp_int()) + temp_unit
+    return str(weather.high_temp) + temp_unit
 
 
 def get_low_temp_copy(weather):
-    return str(weather.low_temp_int()) + temp_unit
+    return str(weather.low_temp) + temp_unit
 
 
 class Weather:
     def __init__(self, coords, api_key=None):
-        coords_str = ",".join([str(c) for c in coords])
-        self.weather = {}
+        self.coords = coords
+        self._coords_str = ",".join([str(c) for c in coords])
+        self.summary_key = None
+        self.current_temp = None
+        self.feels_like = None
+        self.low_temp = None
+        self.high_temp = None
+        self.uv_index = None
         if api_key:
             # exclude=currently,minutely,hourly,daily,alerts,flags
             res = requests.get("https://api.darksky.net/forecast/{}/{}?exclude=minutely,hourly,alerts,flags"
-                               .format(api_key, coords_str))
+                               .format(api_key, self._coords_str))
             if res.status_code == 200:
                 res_json = json.loads(res.content)
-                self.weather["summary-key"] = res_json["daily"]["icon"]
-                self.weather["current-temp"] = int(round(res_json["currently"]["temperature"]))
-                self.weather["feels-like"] = int(round(res_json["currently"]["apparentTemperature"]))
-                self.weather["low-temp"] = int(round(res_json["daily"]["data"][0]["temperatureLow"]))
-                self.weather["high-temp"] = int(round(res_json["daily"]["data"][0]["temperatureHigh"]))
-                self.weather["uv-index"] = int(res_json["daily"]["data"][0]["uvIndex"])
+                self.summary_key = res_json["daily"]["icon"]
+                self.current_temp = int(round(res_json["currently"]["temperature"]))
+                self.feels_like = int(round(res_json["currently"]["apparentTemperature"]))
+                self.low_temp = int(round(res_json["daily"]["data"][0]["temperatureLow"]))
+                self.high_temp = int(round(res_json["daily"]["data"][0]["temperatureHigh"]))
+                self.uv_index = int(res_json["daily"]["data"][0]["uvIndex"])
             else:
                 raise Exception("API request returned a not-OK status code", res.status_code, res.url)
         else:
             print("Info: Fetching data from current forecast page instead of API since no API key was given")
-            res = requests.get("https://darksky.net/forecast/{}/us12/en".format(coords_str))
+            res = requests.get("https://darksky.net/forecast/{}/us12/en".format(self._coords_str))
             if res.status_code == 200:
                 soup = BeautifulSoup(res.content, "lxml")
                 curr = soup.find("span", "currently")
-                self.weather["summary-key"] = curr.img["alt"].split()[0]
-                self.weather["current-temp"] = int(curr.find("span", "summary").text.split()[0][:-1])
+                self.summary_key = curr.img["alt"].split()[0]
+                self.current_temp = int(curr.find("span", "summary").text.split()[0][:-1])
                 high_low = curr.find("span", {"class": "summary-high-low"})
-                self.weather["feels-like"] = int(high_low.find("span", {"class": "feels-like-text"}).text[:-1])
-                self.weather["low-temp"] = int(high_low.find("span", {"class": "low-temp-text"}).text[:-1])
-                self.weather["high-temp"] = int(high_low.find("span", {"class": "high-temp-text"}).text[:-1])
-                self.weather["uv-index"] = int(soup.find(id="currentDetails")
-                                               .find("div", {"class": "uv_index"})
-                                               .find("span", {"class": "uv__index__value"})
-                                               .text)
+                self.feels_like = int(high_low.find("span", {"class": "feels-like-text"}).text[:-1])
+                self.low_temp = int(high_low.find("span", {"class": "low-temp-text"}).text[:-1])
+                self.high_temp = int(high_low.find("span", {"class": "high-temp-text"}).text[:-1])
+                self.uv_index = int(soup.find(id="currentDetails")
+                                    .find("div", {"class": "uv_index"})
+                                    .find("span", {"class": "uv__index__value"})
+                                    .text)
             else:
                 raise Exception("UI request returned a not-OK status code", res.status_code, res.url)
-
-    def summary_key_str(self):
-        return self.weather["summary-key"]
-
-    def current_temp_int(self):
-        return self.weather["current-temp"]
-
-    def feels_like_int(self):
-        return self.weather["feels-like"]
-
-    def low_temp_int(self):
-        return self.weather["low-temp"]
-
-    def high_temp_int(self):
-        return self.weather["high-temp"]
-
-    def uv_index_int(self):
-        return self.weather["uv-index"]
 
 
 def get_api_key_from_config():
