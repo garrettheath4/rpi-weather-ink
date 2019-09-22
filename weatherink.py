@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import argparse
-import random
-
 try:
     from PIL import Image, ImageFont, ImageDraw
 except ImportError:
@@ -11,7 +8,7 @@ except ImportError:
 
 # Fonts
 try:
-    from font_hanken_grotesk import HankenGroteskBold, HankenGroteskMedium
+    from font_hanken_grotesk import HankenGroteskMedium
 except ImportError:
     exit("This script requires the font_hanken_grotesk module\nInstall it with pipenv install --system")
 try:
@@ -23,19 +20,23 @@ except ImportError:
 try:
     import spidev
 except ImportError:
-    print("The inky library probably requires the spidev module\nIf this script fails, install spidev with pipenv install --system")
+    print("The inky library probably requires the spidev module\n"
+          + "If this script fails, install spidev with pipenv install --system")
 try:
     import smbus2
 except ImportError:
-    print("The inky library probably requires the smbus2 module\nIf this script fails, install smbus2 with pipenv install --system")
+    print("The inky library probably requires the smbus2 module\n"
+          + "If this script fails, install smbus2 with pipenv install --system")
 try:
     import RPi.GPIO
 except ImportError:
-    print("The inky library probably requires the RPi.GPIO module\nIf this script fails, install RPi.GPIO with sudo apt install python-rpi.gpio")
+    print("The inky library probably requires the RPi.GPIO module\n"
+          + "If this script fails, install RPi.GPIO with sudo apt install python-rpi.gpio")
 try:
     import numpy
 except ImportError:
-    print("The inky library probably requires the numpy module\nIf this script fails, install numpy with sudo apt install python-numpy")
+    print("The inky library probably requires the numpy module\n"
+          + "If this script fails, install numpy with sudo apt install python-numpy")
 
 try:
     from inky import InkyPHAT, InkyWHAT
@@ -55,7 +56,8 @@ except ImportError:
 try:
     import lxml
 except ImportError:
-    print("The BeautifulSoup library probably requires the lxml module\nIf this script fails, install lxml with sudo apt install python-lxml")
+    print("The BeautifulSoup library probably requires the lxml module\n"
+          + "If this script fails, install lxml with sudo apt install python-lxml")
 
 location_coords = [38.928766, -77.032645]
 fa_filename = "Font Awesome 5 Free-Solid-900.otf"
@@ -129,9 +131,9 @@ def draw_text(text, quadrant, image, display_size, font_awesome=False):
 
 
 def get_sky_icon(weather):
-    sun_icon   = u"\uf185"
+    sun_icon = u"\uf185"
     cloud_icon = u"\uf0c2"
-    rain_icon  = u"\uf73d"
+    rain_icon = u"\uf73d"
     question_icon = u"\uf128"
     icons = {
                 "clear-day": sun_icon,
@@ -168,14 +170,14 @@ class Weather:
             curr = soup.find("span", "currently")
             self.weather["summary"] = curr.img["alt"].split()[0]
             self.weather["current-temp"] = int(curr.find("span", "summary").text.split()[0][:-1])
-            high_low = curr.find("span", { "class": "summary-high-low" })
-            self.weather["feels-like"] = int(high_low.find("span", { "class": "feels-like-text" }).text[:-1])
-            self.weather["low-temp"]   = int(high_low.find("span", { "class": "low-temp-text" }).text[:-1])
-            self.weather["high-temp"]  = int(high_low.find("span", { "class": "high-temp-text" }).text[:-1])
-            self.weather["uv-index"] = int(soup.find(id="currentDetails") \
-                .find("div", { "class": "uv_index" }) \
-                .find("span", { "class": "uv__index__value" }) \
-                .text)
+            high_low = curr.find("span", {"class": "summary-high-low"})
+            self.weather["feels-like"] = int(high_low.find("span", {"class": "feels-like-text"}).text[:-1])
+            self.weather["low-temp"] = int(high_low.find("span", {"class": "low-temp-text"}).text[:-1])
+            self.weather["high-temp"] = int(high_low.find("span", {"class": "high-temp-text"}).text[:-1])
+            self.weather["uv-index"] = int(soup.find(id="currentDetails")
+                                           .find("div", {"class": "uv_index"})
+                                           .find("span", {"class": "uv__index__value"})
+                                           .text)
 
     def summary_text(self):
         return self.weather["summary"]
