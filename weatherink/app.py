@@ -66,18 +66,19 @@ def run():
     inky_display.set_border(InkyPHAT.YELLOW)
 
     img = Image.new("P", display_size)
+    image_draw = ImageDraw.Draw(img)
 
     weather = Weather(location_coords)
     # TODO: Only update the display if the data has changed since the last refresh
     # (Use a temporary file to save the data for the most recent screen draw)
 
-    draw_text(weather.uv_index,            2, img, display_size)
-    draw_text(get_sky_icon(weather),       3, img, display_size, use_icon_font=True)
-    draw_text(get_high_temp_copy(weather), 1, img, display_size)
-    draw_text(get_low_temp_copy(weather),  4, img, display_size)
+    draw_text(weather.uv_index,            2, image_draw, display_size)
+    draw_text(get_sky_icon(weather),       3, image_draw, display_size, use_icon_font=True)
+    draw_text(get_high_temp_copy(weather), 1, image_draw, display_size)
+    draw_text(get_low_temp_copy(weather),  4, image_draw, display_size)
 
     if weather.is_uv_warning():
-        ImageDraw.Draw(img).text(radiation_location, radiation_icon, InkyPHAT.YELLOW, font=icons_font)
+        image_draw.text(radiation_location, radiation_icon, InkyPHAT.YELLOW, font=icons_font)
 
     # TODO: Show the chance of precipitation next to the sky icon
 
@@ -85,7 +86,7 @@ def run():
     inky_display.show()
 
 
-def draw_text(text, quadrant, image, display_size, use_icon_font=False):
+def draw_text(text, quadrant, image_draw, display_size, use_icon_font=False):
     text_str = text
     if type(text) not in (unicode, str):
         text_str = str(text)
@@ -114,7 +115,7 @@ def draw_text(text, quadrant, image, display_size, use_icon_font=False):
     if quadrant in (3, 4):
         text_y += display_height / 2
 
-    ImageDraw.Draw(image).text((text_x, text_y), text_str, InkyPHAT.BLACK, font=draw_font)
+    image_draw.text((text_x, text_y), text_str, InkyPHAT.BLACK, font=draw_font)
 
 
 def get_sky_icon(weather):
