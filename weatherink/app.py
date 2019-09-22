@@ -82,7 +82,7 @@ def run():
     inky_display.show()
 
 
-def draw_text(text, quadrant, image_draw, display_size, use_icon_font=False):
+def draw_text(text, quadrant, image_draw, display_size, use_icon_font=False, debug=False):
     text_str = text
     if type(text) not in (unicode, str):
         text_str = str(text)
@@ -112,6 +112,9 @@ def draw_text(text, quadrant, image_draw, display_size, use_icon_font=False):
         text_y += display_height / 2
 
     image_draw.text((text_x, text_y), text_str, InkyPHAT.BLACK, font=draw_font)
+
+    if debug:
+        image_draw.rectangle([(text_x, text_y), (text_x + text_w, text_y + text_h)])
 
 
 def get_sky_icon(weather):
