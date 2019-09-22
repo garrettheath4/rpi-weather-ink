@@ -2,6 +2,7 @@ class InkyPHAT:
     WIDTH = 212
     HEIGHT = 104
     BLACK = 1
+    RED = 1
     YELLOW = 2
 
     def __init__(self, color):

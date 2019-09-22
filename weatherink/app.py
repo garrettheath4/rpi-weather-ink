@@ -130,7 +130,9 @@ def draw_text(text, quadrant, image_draw, display_size, use_icon_font=False, deb
     image_draw.text((text_x, text_y), text_str, InkyPHAT.BLACK, font=draw_font)
 
     if debug:
-        image_draw.rectangle([(text_x, text_y), (text_x + text_w, text_y + text_h)])
+        image_draw.rectangle([(text_x, text_y), (text_x + text_w, text_y + text_h)],
+                             outline=InkyPHAT.RED,
+                             width=2)
 
 
 def get_sky_icon(weather):
