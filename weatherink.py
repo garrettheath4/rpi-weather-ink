@@ -75,6 +75,9 @@ COLOR = "yellow"
 font_size = 38
 scale_size = 1
 temp_unit = u"°F"
+left_pull = 20
+radiation_icon = u"\uf7ba"
+radiation_location = (75 - left_pull, 6)
 
 fontawesome_font = ImageFont.truetype(fa_filename, int(font_size * scale_size))
 hanken_grotesk_font = ImageFont.truetype(HankenGroteskMedium, int(font_size * scale_size))
@@ -85,19 +88,13 @@ def main():
     display_size = (inky_display.WIDTH, inky_display.HEIGHT)
 
     # inky_display.set_rotation(180)
-    inky_display.set_border(inky_display.RED)
+    inky_display.set_border(inky_display.YELLOW)
 
     img = Image.new("P", display_size)
 
-    # Draw vertical line
-    for y in range(0, inky_display.height):
-        img.putpixel((inky_display.width / 2, y), inky_display.BLACK)
-
-    # Draw horizontal line
-    for x in range(0, inky_display.width):
-        img.putpixel((x, inky_display.height / 2), inky_display.BLACK)
-
     weather = Weather(location_coords, get_api_key_from_config())
+    # TODO: Only update the display if the data has changed since the last refresh
+    # (Use a temporary file to save the data for the most recent screen draw)
 
     draw_text(weather.uv_index_int(),      2, img, display_size)
     draw_text(get_sky_icon(weather),       3, img, display_size, font_awesome=True)
@@ -105,18 +102,15 @@ def main():
     draw_text(get_low_temp_copy(weather),  4, img, display_size)
 
     if weather.uv_index_int() > 5:
-        radiation_icon = u"\uf7ba"
-        ImageDraw(img).text((300, 20), radiation_icon, InkyPHAT.YELLOW, font=fontawesome_font)
+        ImageDraw.Draw(img).text(radiation_location, radiation_icon, InkyPHAT.YELLOW, font=fontawesome_font)
+
+    # TODO: Show the chance of precipitation next to the sky icon
 
     inky_display.set_image(img)
     inky_display.show()
 
 
 def draw_text(text, quadrant, image, display_size, font_awesome=False):
-    # intuitive_font = ImageFont.truetype(Intuitive, int(22 * scale_size))
-    # hanken_bold_font = ImageFont.truetype(HankenGroteskBold, int(35 * scale_size))
-    # hanken_medium_font = ImageFont.truetype(HankenGroteskMedium, int(font_size * scale_size))
-
     if font_awesome:
         draw_font = fontawesome_font
     else:
@@ -136,7 +130,10 @@ def draw_text(text, quadrant, image, display_size, font_awesome=False):
     text_w, text_h = draw_font.getsize(text_str)
     text_x = int(max((display_width / 2) - text_w, 0) / 2)
     if quadrant in (1, 4):
+        # TODO: Right-align text instead of centering in quadrant
         text_x += display_width / 2
+    else:
+        text_x -= left_pull
     text_y = int(max((display_height / 2) - font_height, 0) / 2)
     if quadrant in (3, 4):
         text_y += display_height / 2
