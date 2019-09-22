@@ -134,18 +134,23 @@ def get_sky_icon(weather):
     sun_icon = u"\uf185"
     cloud_icon = u"\uf0c2"
     rain_icon = u"\uf73d"
+    moon_icon = u"\uf186"
+    cloud_moon_icon = u"\uf6c3"
+    snowflake_icon = u"\uf2dc"
+    wind_icon = u"\uf72e"
+    smog_icon = u"\uf75f"
     question_icon = u"\uf128"
     icons = {
                 "clear-day": sun_icon,
-                "clear-night": sun_icon,
+                "clear-night": moon_icon,
                 "partly-cloudy-day": cloud_icon,
-                "partly-cloudy-night": cloud_icon,
+                "partly-cloudy-night": cloud_moon_icon,
                 "cloudy": cloud_icon,
                 "rain": rain_icon,
-                "sleet": rain_icon,
-                "snow": rain_icon,
-                "wind": sun_icon,
-                "fog": cloud_icon,
+                "sleet": snowflake_icon,
+                "snow": snowflake_icon,
+                "wind": wind_icon,
+                "fog": smog_icon,
             }
     if weather.summary_text() in icons:
         return icons[weather.summary_text()]
