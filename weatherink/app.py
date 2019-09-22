@@ -10,17 +10,6 @@ except ImportError:
     Image, ImageFont, ImageDraw = None, None, None
     exit("This script requires PIL/Pillow to be installed\nInstall it with: sudo apt install python-pil")
 
-# Fonts
-try:
-    from font_hanken_grotesk import HankenGroteskMedium
-except ImportError:
-    HankenGroteskMedium = None
-    exit("This script requires the font_hanken_grotesk module\nInstall it with pipenv install --system")
-try:
-    from font_intuitive import Intuitive
-except ImportError:
-    exit("This script requires the font_intuitive module\nInstall it with pipenv install --system")
-
 # Transitive dependencies of Inky library
 try:
     import spidev
@@ -68,7 +57,8 @@ except ImportError:
           + "If this script fails, install lxml with sudo apt install python-lxml")
 
 location_coords = [38.928766, -77.032645]
-fa_filename = "Font Awesome 5 Free-Solid-900.otf"
+text_font_filename = "resources/Ubuntu-Regular.ttf"
+icons_font_filename = "resources/Font Awesome 5 Free-Solid-900.otf"
 
 # phat-specific (as opposed to what-specific)
 COLOR = "yellow"
@@ -79,8 +69,8 @@ left_pull = 20
 radiation_icon = u"\uf7ba"
 radiation_location = (75 - left_pull, 6)
 
-fontawesome_font = ImageFont.truetype(fa_filename, int(font_size * scale_size))
-hanken_grotesk_font = ImageFont.truetype(HankenGroteskMedium, int(font_size * scale_size))
+icons_font = ImageFont.truetype(icons_font_filename, int(font_size * scale_size))
+text_font = ImageFont.truetype(text_font_filename, int(font_size * scale_size))
 
 
 def run():
@@ -100,12 +90,12 @@ def run():
     # (Use a temporary file to save the data for the most recent screen draw)
 
     draw_text(weather.uv_index,            2, img, display_size)
-    draw_text(get_sky_icon(weather),       3, img, display_size, font_awesome=True)
+    draw_text(get_sky_icon(weather),       3, img, display_size, use_icon_font=True)
     draw_text(get_high_temp_copy(weather), 1, img, display_size)
     draw_text(get_low_temp_copy(weather),  4, img, display_size)
 
     if weather.uv_index > 5:
-        ImageDraw.Draw(img).text(radiation_location, radiation_icon, InkyPHAT.YELLOW, font=fontawesome_font)
+        ImageDraw.Draw(img).text(radiation_location, radiation_icon, InkyPHAT.YELLOW, font=icons_font)
 
     # TODO: Show the chance of precipitation next to the sky icon
 
@@ -113,11 +103,11 @@ def run():
     inky_display.show()
 
 
-def draw_text(text, quadrant, image, display_size, font_awesome=False):
-    if font_awesome:
-        draw_font = fontawesome_font
+def draw_text(text, quadrant, image, display_size, use_icon_font=False):
+    if use_icon_font:
+        draw_font = icons_font
     else:
-        draw_font = hanken_grotesk_font
+        draw_font = text_font
 
     # Ensure baselines line up by always calculating font height including cap
     # line height and descender line height (i.e. vertically align "ab" as if it
