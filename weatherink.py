@@ -2,16 +2,19 @@
 # -*- coding: utf-8 -*-
 
 import ConfigParser
+import json
 
 try:
     from PIL import Image, ImageFont, ImageDraw
 except ImportError:
+    Image, ImageFont, ImageDraw = None, None, None
     exit("This script requires PIL/Pillow to be installed\nInstall it with: sudo apt install python-pil")
 
 # Fonts
 try:
     from font_hanken_grotesk import HankenGroteskMedium
 except ImportError:
+    HankenGroteskMedium = None
     exit("This script requires the font_hanken_grotesk module\nInstall it with pipenv install --system")
 try:
     from font_intuitive import Intuitive
@@ -41,18 +44,21 @@ except ImportError:
           + "If this script fails, install numpy with sudo apt install python-numpy")
 
 try:
-    from inky import InkyPHAT, InkyWHAT
+    from inky import InkyPHAT
 except ImportError:
+    InkyPHAT = lambda x: x
     exit("This script requires the inky module\nInstall it with sudo pip install inky")
 
 try:
     import requests
 except ImportError:
+    requests = None
     exit("This script requires the requests module\nInstall it with pipenv install --system")
 
 try:
     from bs4 import BeautifulSoup
 except ImportError:
+    BeautifulSoup = lambda x, y: x
     exit("This script requires the BeautifulSoup module\nInstall it with pipenv install --system")
 
 try:
@@ -154,8 +160,8 @@ def get_sky_icon(weather):
                 "wind": wind_icon,
                 "fog": smog_icon,
             }
-    if weather.summary_text() in icons:
-        return icons[weather.summary_text()]
+    if weather.summary_key_str() in icons:
+        return icons[weather.summary_key_str()]
     else:
         return question_icon
 
@@ -172,16 +178,22 @@ class Weather:
     def __init__(self, coords, api_key=None):
         self.weather = {}
         if api_key:
-            res = requests.get("https://api.darksky.net/forecast/{}/{}")
+            # exclude=currently,minutely,hourly,daily,alerts,flags
+            res = requests.get("https://api.darksky.net/forecast/{}/{}?exclude=minutely,hourly,alerts,flags")
             if res.status_code == 200:
-                # TODO
-                pass
+                res_json = json.loads(res.content)
+                self.weather["summary-key"] = res_json["daily"]["icon"]
+                self.weather["current-temp"] = int(round(res_json["currently"]["temperature"]))
+                self.weather["feels-like"] = int(round(res_json["currently"]["apparentTemperature"]))
+                self.weather["low-temp"] = int(round(res_json["daily"]["data"][0]["temperatureLow"]))
+                self.weather["high-temp"] = int(round(res_json["daily"]["data"][0]["temperatureHigh"]))
+                self.weather["uv-index"] = int(res_json["daily"]["data"][0]["uvIndex"])
         else:
             res = requests.get("https://darksky.net/forecast/{}/us12/en".format(",".join([str(c) for c in coords])))
             if res.status_code == 200:
                 soup = BeautifulSoup(res.content, "lxml")
                 curr = soup.find("span", "currently")
-                self.weather["summary"] = curr.img["alt"].split()[0]
+                self.weather["summary-key"] = curr.img["alt"].split()[0]
                 self.weather["current-temp"] = int(curr.find("span", "summary").text.split()[0][:-1])
                 high_low = curr.find("span", {"class": "summary-high-low"})
                 self.weather["feels-like"] = int(high_low.find("span", {"class": "feels-like-text"}).text[:-1])
@@ -192,8 +204,8 @@ class Weather:
                                                .find("span", {"class": "uv__index__value"})
                                                .text)
 
-    def summary_text(self):
-        return self.weather["summary"]
+    def summary_key_str(self):
+        return self.weather["summary-key"]
 
     def current_temp_int(self):
         return self.weather["current-temp"]
