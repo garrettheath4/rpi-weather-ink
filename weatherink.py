@@ -95,7 +95,7 @@ def main():
     for x in range(0, inky_display.width):
         img.putpixel((x, inky_display.height / 2), inky_display.BLACK)
 
-    weather = Weather(location_coords)
+    weather = Weather(location_coords, get_api_key_from_config())
 
     draw_text(weather.uv_index_int(),      2, img, display_size)
     draw_text(get_sky_icon(weather),       3, img, display_size, font_awesome=True)
@@ -176,10 +176,12 @@ def get_low_temp_copy(weather):
 
 class Weather:
     def __init__(self, coords, api_key=None):
+        coords_str = ",".join([str(c) for c in coords])
         self.weather = {}
         if api_key:
             # exclude=currently,minutely,hourly,daily,alerts,flags
-            res = requests.get("https://api.darksky.net/forecast/{}/{}?exclude=minutely,hourly,alerts,flags")
+            res = requests.get("https://api.darksky.net/forecast/{}/{}?exclude=minutely,hourly,alerts,flags"
+                    .format(api_key, coords_str))
             if res.status_code == 200:
                 res_json = json.loads(res.content)
                 self.weather["summary-key"] = res_json["daily"]["icon"]
@@ -188,8 +190,10 @@ class Weather:
                 self.weather["low-temp"] = int(round(res_json["daily"]["data"][0]["temperatureLow"]))
                 self.weather["high-temp"] = int(round(res_json["daily"]["data"][0]["temperatureHigh"]))
                 self.weather["uv-index"] = int(res_json["daily"]["data"][0]["uvIndex"])
+            else:
+                raise Exception("API request returned a not-OK status code", res.status_code, res.url)
         else:
-            res = requests.get("https://darksky.net/forecast/{}/us12/en".format(",".join([str(c) for c in coords])))
+            res = requests.get("https://darksky.net/forecast/{}/us12/en".format(coords_str))
             if res.status_code == 200:
                 soup = BeautifulSoup(res.content, "lxml")
                 curr = soup.find("span", "currently")
@@ -203,6 +207,8 @@ class Weather:
                                                .find("div", {"class": "uv_index"})
                                                .find("span", {"class": "uv__index__value"})
                                                .text)
+            else:
+                raise Exception("UI request returned a not-OK status code", res.status_code, res.url)
 
     def summary_key_str(self):
         return self.weather["summary-key"]
@@ -226,7 +232,10 @@ class Weather:
 def get_api_key_from_config():
     config = ConfigParser.RawConfigParser()
     config.read('secrets.ini')
-    return config.get("DarkSky", "api-key")
+    try:
+        return config.get("DarkSky", "api-key")
+    except (ConfigParser.NoSectionError, ConfigParser.NoOptionError) as e:
+        return None
 
 
 if __name__ == "__main__":
