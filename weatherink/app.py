@@ -57,7 +57,7 @@ scale_size = 1
 temp_unit = u"\u00B0F"  # degree F
 padding = 10
 left_nudge = 20
-up_text_nudge = 5
+up_text_nudge = 4
 radiation_icon = u"\uf7ba"
 radiation_location = (75 - left_nudge, 6)
 
@@ -110,24 +110,20 @@ def palletize(image):
     image.putpalette((white + black + red) * 85 + white)
 
 
-def draw_text(text, quadrant, image_draw, display_size, use_icon_font=False, debug=False):
+def draw_text(text, quadrant, image_draw, display_size, align="c", use_icon_font=False, debug=False):
     text_str = text
     if type(text) not in (unicode, str):
         text_str = str(text)
 
     if use_icon_font:
         draw_font = icons_font
-        _, font_height = draw_font.getsize(text_str)
     else:
         draw_font = text_font
-        # Ensure baselines line up by always calculating font height including cap
-        # line height (i.e. vertically align "ao" as if it were as high as "AO")
-        _, font_height = draw_font.getsize("F")
 
     display_width, display_height = display_size
-
     text_w, text_h = draw_font.getsize(text_str)
-    text_x = int(max((display_width / 2) - text_w, 0))
+
+    text_x = int(max((display_width / 2) - text_w, padding))
     if quadrant in (1, 4):
         # Right-align
         text_x += display_width / 2 - padding
@@ -135,7 +131,7 @@ def draw_text(text, quadrant, image_draw, display_size, use_icon_font=False, deb
         # Center and then nudge left
         text_x /= 2
         text_x += padding - left_nudge
-    text_y = int(max((display_height / 2) - font_height, 0) / 2)
+    text_y = int(max((display_height / 2) - text_h, 0) / 2)
     if quadrant in (3, 4):
         text_y += display_height / 2
 
