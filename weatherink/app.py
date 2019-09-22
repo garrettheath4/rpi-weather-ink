@@ -105,19 +105,20 @@ def run():
 
 
 def draw_text(text, quadrant, image, display_size, use_icon_font=False):
-    if use_icon_font:
-        draw_font = icons_font
-    else:
-        draw_font = text_font
-
     text_str = text
     if type(text) not in (unicode, str):
         text_str = str(text)
 
-    _, font_height = draw_font.getsize(text_str)
+    if use_icon_font:
+        draw_font = icons_font
+        _, font_height = draw_font.getsize(text_str)
+    else:
+        draw_font = text_font
+        # Ensure baselines line up by always calculating font height including cap
+        # line height (i.e. vertically align "ao" as if it were as high as "AO")
+        _, font_height = draw_font.getsize("F")
 
     display_width, display_height = display_size
-
 
     text_w, text_h = draw_font.getsize(text_str)
     text_x = int(max((display_width / 2) - text_w, 0))
