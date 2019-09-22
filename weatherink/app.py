@@ -67,7 +67,7 @@ def get_debug_from_config():
     if not successful:
         return False
     try:
-        config.getboolean("weatherink", "debug")
+        return config.getboolean("weatherink", "debug")
     except (ConfigParser.NoSectionError, ConfigParser.NoOptionError):
         return False
 
