@@ -46,7 +46,7 @@ except ImportError:
 try:
     from inky import InkyPHAT
 except ImportError:
-    InkyPHAT = lambda x: x
+    from tests.mock import InkyPHAT
     exit("This script requires the inky module\nInstall it with sudo pip install inky")
 
 try:
@@ -58,7 +58,7 @@ except ImportError:
 try:
     from bs4 import BeautifulSoup
 except ImportError:
-    BeautifulSoup = lambda x, y: x
+    from tests.mock import BeautifulSoup
     exit("This script requires the BeautifulSoup module\nInstall it with pipenv install --system")
 
 try:
@@ -74,7 +74,7 @@ fa_filename = "Font Awesome 5 Free-Solid-900.otf"
 COLOR = "yellow"
 font_size = 38
 scale_size = 1
-temp_unit = u"°F"
+temp_unit = u"\u2109"
 left_pull = 20
 radiation_icon = u"\uf7ba"
 radiation_location = (75 - left_pull, 6)
@@ -84,11 +84,14 @@ hanken_grotesk_font = ImageFont.truetype(HankenGroteskMedium, int(font_size * sc
 
 
 def run():
+    if InkyPHAT is None:
+        print("Error: InkyPHAT was not properly imported")
+        return
     inky_display = InkyPHAT(COLOR)
-    display_size = (inky_display.WIDTH, inky_display.HEIGHT)
+    display_size = (InkyPHAT.WIDTH, InkyPHAT.HEIGHT)
 
     # inky_display.set_rotation(180)
-    inky_display.set_border(inky_display.YELLOW)
+    inky_display.set_border(InkyPHAT.YELLOW)
 
     img = Image.new("P", display_size)
 
