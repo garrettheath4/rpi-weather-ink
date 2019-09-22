@@ -52,6 +52,11 @@ try:
 except ImportError:
     exit("This script requires the BeautifulSoup module\nInstall it with pipenv install --system")
 
+try:
+    import lxml
+except ImportError:
+    print("The BeautifulSoup library probably requires the lxml module\nIf this script fails, install lxml with sudo apt install python-lxml")
+
 location_coords = [38.928766, -77.032645]
 fa_filename = "Font Awesome 5 Free-Solid-900.otf"
 
