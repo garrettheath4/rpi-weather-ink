@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import ConfigParser
+
 try:
     from PIL import Image, ImageFont, ImageDraw
 except ImportError:
@@ -167,22 +169,28 @@ def get_low_temp_copy(weather):
 
 
 class Weather:
-    def __init__(self, coords):
+    def __init__(self, coords, api_key=None):
         self.weather = {}
-        res = requests.get("https://darksky.net/forecast/{}/us12/en".format(",".join([str(c) for c in coords])))
-        if res.status_code == 200:
-            soup = BeautifulSoup(res.content, "lxml")
-            curr = soup.find("span", "currently")
-            self.weather["summary"] = curr.img["alt"].split()[0]
-            self.weather["current-temp"] = int(curr.find("span", "summary").text.split()[0][:-1])
-            high_low = curr.find("span", {"class": "summary-high-low"})
-            self.weather["feels-like"] = int(high_low.find("span", {"class": "feels-like-text"}).text[:-1])
-            self.weather["low-temp"] = int(high_low.find("span", {"class": "low-temp-text"}).text[:-1])
-            self.weather["high-temp"] = int(high_low.find("span", {"class": "high-temp-text"}).text[:-1])
-            self.weather["uv-index"] = int(soup.find(id="currentDetails")
-                                           .find("div", {"class": "uv_index"})
-                                           .find("span", {"class": "uv__index__value"})
-                                           .text)
+        if api_key:
+            res = requests.get("https://api.darksky.net/forecast/{}/{}")
+            if res.status_code == 200:
+                # TODO
+                pass
+        else:
+            res = requests.get("https://darksky.net/forecast/{}/us12/en".format(",".join([str(c) for c in coords])))
+            if res.status_code == 200:
+                soup = BeautifulSoup(res.content, "lxml")
+                curr = soup.find("span", "currently")
+                self.weather["summary"] = curr.img["alt"].split()[0]
+                self.weather["current-temp"] = int(curr.find("span", "summary").text.split()[0][:-1])
+                high_low = curr.find("span", {"class": "summary-high-low"})
+                self.weather["feels-like"] = int(high_low.find("span", {"class": "feels-like-text"}).text[:-1])
+                self.weather["low-temp"] = int(high_low.find("span", {"class": "low-temp-text"}).text[:-1])
+                self.weather["high-temp"] = int(high_low.find("span", {"class": "high-temp-text"}).text[:-1])
+                self.weather["uv-index"] = int(soup.find(id="currentDetails")
+                                               .find("div", {"class": "uv_index"})
+                                               .find("span", {"class": "uv__index__value"})
+                                               .text)
 
     def summary_text(self):
         return self.weather["summary"]
@@ -201,6 +209,12 @@ class Weather:
 
     def uv_index_int(self):
         return self.weather["uv-index"]
+
+
+def get_api_key_from_config():
+    config = ConfigParser.RawConfigParser()
+    config.read('secrets.ini')
+    return config.get("DarkSky", "api-key")
 
 
 if __name__ == "__main__":
