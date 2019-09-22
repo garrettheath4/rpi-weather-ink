@@ -65,9 +65,10 @@ COLOR = "yellow"
 font_size = 38
 scale_size = 1
 temp_unit = u"\u00B0F"  # degree F
-left_pull = 20
+padding = 10
+left_nudge = 20
 radiation_icon = u"\uf7ba"
-radiation_location = (75 - left_pull, 6)
+radiation_location = (75 - left_nudge, 6)
 
 icons_font = ImageFont.truetype(icons_font_filename, int(font_size * scale_size))
 text_font = ImageFont.truetype(text_font_filename, int(font_size * scale_size))
@@ -109,10 +110,7 @@ def draw_text(text, quadrant, image, display_size, use_icon_font=False):
     else:
         draw_font = text_font
 
-    # Ensure baselines line up by always calculating font height including cap
-    # line height and descender line height (i.e. vertically align "ab" as if it
-    # were as high as "Ay")
-    _, font_height = draw_font.getsize("Ay")
+    _, font_height = draw_font.getsize(text)
 
     display_width, display_height = display_size
 
@@ -121,12 +119,14 @@ def draw_text(text, quadrant, image, display_size, use_icon_font=False):
         text_str = str(text)
 
     text_w, text_h = draw_font.getsize(text_str)
-    text_x = int(max((display_width / 2) - text_w, 0) / 2)
+    text_x = int(max((display_width / 2) - text_w, 0))
     if quadrant in (1, 4):
-        # TODO: Right-align text instead of centering in quadrant
-        text_x += display_width / 2
+        # Right-align
+        text_x += display_width / 2 - padding
     else:
-        text_x -= left_pull
+        # Center and then nudge left
+        text_x /= 2
+        text_x += padding - left_nudge
     text_y = int(max((display_height / 2) - font_height, 0) / 2)
     if quadrant in (3, 4):
         text_y += display_height / 2
