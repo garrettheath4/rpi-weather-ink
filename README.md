@@ -55,6 +55,14 @@ mkdir ~/.local/share/virtualenvs/rpi-weather-ink-T1XSpv21/lib/python2.7/dist-pac
 ln -s /usr/lib/python2.7/dist-packages/PIL ~/.local/share/virtualenvs/rpi-weather-ink-T1XSpv21/lib/python2.7/dist-packages/PIL
 ```
 
+When adding new dependencies to this project, try to add them using first
+successful method listed below, in order:
+
+1. `pipenv install <package>`
+1. `sudo pip install <package>`
+1. `sudo apt install <package>`
+
+
 ## Hardware
 
 * Raspberry Pi Zero WH (Zero W with Headers)
