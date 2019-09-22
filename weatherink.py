@@ -76,6 +76,9 @@ font_size = 38
 scale_size = 1
 temp_unit = u"°F"
 
+fontawesome_font = ImageFont.truetype(fa_filename, int(font_size * scale_size))
+hanken_grotesk_font = ImageFont.truetype(HankenGroteskMedium, int(font_size * scale_size))
+
 
 def main():
     inky_display = InkyPHAT(COLOR)
@@ -101,6 +104,10 @@ def main():
     draw_text(get_high_temp_copy(weather), 1, img, display_size)
     draw_text(get_low_temp_copy(weather),  4, img, display_size)
 
+    if weather.uv_index_int() > 5:
+        radiation_icon = u"\uf7ba"
+        ImageDraw(img).text((300, 20), radiation_icon, InkyPHAT.YELLOW, font=fontawesome_font)
+
     inky_display.set_image(img)
     inky_display.show()
 
@@ -111,9 +118,9 @@ def draw_text(text, quadrant, image, display_size, font_awesome=False):
     # hanken_medium_font = ImageFont.truetype(HankenGroteskMedium, int(font_size * scale_size))
 
     if font_awesome:
-        draw_font = ImageFont.truetype(fa_filename, int(font_size * scale_size))
+        draw_font = fontawesome_font
     else:
-        draw_font = ImageFont.truetype(HankenGroteskMedium, int(font_size * scale_size))
+        draw_font = hanken_grotesk_font
 
     # Ensure baselines line up by always calculating font height including cap
     # line height and descender line height (i.e. vertically align "ab" as if it
