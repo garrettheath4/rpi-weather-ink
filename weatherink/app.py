@@ -83,7 +83,7 @@ fontawesome_font = ImageFont.truetype(fa_filename, int(font_size * scale_size))
 hanken_grotesk_font = ImageFont.truetype(HankenGroteskMedium, int(font_size * scale_size))
 
 
-def main():
+def run():
     inky_display = InkyPHAT(COLOR)
     display_size = (inky_display.WIDTH, inky_display.HEIGHT)
 
@@ -96,7 +96,7 @@ def main():
     # TODO: Only update the display if the data has changed since the last refresh
     # (Use a temporary file to save the data for the most recent screen draw)
 
-    draw_text(weather.uv_index,      2, img, display_size)
+    draw_text(weather.uv_index,            2, img, display_size)
     draw_text(get_sky_icon(weather),       3, img, display_size, font_awesome=True)
     draw_text(get_high_temp_copy(weather), 1, img, display_size)
     draw_text(get_low_temp_copy(weather),  4, img, display_size)
@@ -152,17 +152,17 @@ def get_sky_icon(weather):
     smog_icon = u"\uf75f"
     question_icon = u"\uf128"
     icons = {
-                "clear-day": sun_icon,
-                "clear-night": moon_icon,
-                "partly-cloudy-day": cloud_icon,
-                "partly-cloudy-night": cloud_moon_icon,
-                "cloudy": cloud_icon,
-                "rain": rain_icon,
-                "sleet": snowflake_icon,
-                "snow": snowflake_icon,
-                "wind": wind_icon,
-                "fog": smog_icon,
-            }
+        "clear-day": sun_icon,
+        "clear-night": moon_icon,
+        "partly-cloudy-day": cloud_icon,
+        "partly-cloudy-night": cloud_moon_icon,
+        "cloudy": cloud_icon,
+        "rain": rain_icon,
+        "sleet": snowflake_icon,
+        "snow": snowflake_icon,
+        "wind": wind_icon,
+        "fog": smog_icon,
+    }
     if weather.summary_key in icons:
         return icons[weather.summary_key]
     else:
@@ -231,4 +231,4 @@ def get_api_key_from_config():
 
 
 if __name__ == "__main__":
-    main()
+    run()

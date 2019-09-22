@@ -32,11 +32,11 @@ api-key = 1234567890abcdef0123456789ABCDEF
 
 ### Run Once
 
-Just run the `weatherink.py` script to refresh the e-ink display.
+Just run the `weatherink` module to refresh the e-ink display.
 
 ```
 cd rpi-weather-ink/
-./weatherink.py
+python -m weatherink
 ```
 
 ### Run Automatically
@@ -45,7 +45,7 @@ Run `crontab -e` and insert the following line into your crontab file to
 refresh the screen every 5 minutes.
 
 ```
-*/5 * * * * cd $HOME/rpi-weather-ink/ && ./weatherink.py
+*/5 * * * * cd $HOME/rpi-weather-ink/ && ( git pull -q ; python -m weatherink )
 ```
 
 ## Development
@@ -55,7 +55,7 @@ refresh the screen every 5 minutes.
 ```
 sudo pip install pipenv
 pipenv install <python-package>
-pipenv run python weatherink.py
+pipenv run python -m weatherink
 pipenv lock -r > requirements.txt
 sudo pip install -r requirements.txt
 ```
