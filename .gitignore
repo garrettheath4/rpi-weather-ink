@@ -1,6 +1,7 @@
 secrets.ini
 
-# virtualenv
+# Python
+*.pyc
 venv/
 
 # Vim
