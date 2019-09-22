@@ -24,6 +24,8 @@ except ImportError:
 
 
 class Weather:
+    secrets_filename = "resources/secrets.ini"
+
     def __init__(self, coords, query_api=True, uv_warning_threshold=6):
         self.coords = coords
         self._coords_str = ",".join([str(c) for c in coords])
@@ -47,7 +49,7 @@ class Weather:
     @staticmethod
     def get_api_key_from_config():
         config = ConfigParser.RawConfigParser()
-        config.read("resources/secrets.ini")
+        config.read(Weather.secrets_filename)
         try:
             return config.get("DarkSky", "api-key")
         except (ConfigParser.NoSectionError, ConfigParser.NoOptionError):

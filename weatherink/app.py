@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import ConfigParser
+
 try:
     from PIL import Image, ImageFont, ImageDraw
 except ImportError:
@@ -37,7 +39,11 @@ except ImportError:
 
 from weatherink.fetch.weather import Weather
 
+# User settings
 location_coords = [38.928766, -77.032645]
+configuration_filename = "resources/application.ini"
+
+# App resources
 text_font_filename = "resources/Ubuntu-Regular.ttf"
 icons_font_filename = "resources/Font Awesome 5 Free-Solid-900.otf"
 
@@ -55,10 +61,20 @@ icons_font = ImageFont.truetype(icons_font_filename, int(font_size * scale_size)
 text_font = ImageFont.truetype(text_font_filename, int(font_size * scale_size))
 
 
+def get_debug_from_config():
+    config = ConfigParser.RawConfigParser()
+    successful = config.read(configuration_filename)
+    if not successful:
+        return False
+    try:
+        config.getboolean("weatherink", "debug")
+    except (ConfigParser.NoSectionError, ConfigParser.NoOptionError):
+        return False
+
+
 def run():
-    if InkyPHAT is None:
-        print("Error: InkyPHAT was not properly imported")
-        return
+    debug = get_debug_from_config()
+
     inky_display = InkyPHAT(COLOR)
     display_size = (InkyPHAT.WIDTH, InkyPHAT.HEIGHT)
 
@@ -70,10 +86,10 @@ def run():
 
     weather = Weather(location_coords)
 
-    draw_text(weather.uv_index,            2, image_draw, display_size)
-    draw_text(get_sky_icon(weather),       3, image_draw, display_size, use_icon_font=True)
-    draw_text(get_high_temp_copy(weather), 1, image_draw, display_size)
-    draw_text(get_low_temp_copy(weather),  4, image_draw, display_size)
+    draw_text(weather.uv_index,            2, image_draw, display_size, debug=debug)
+    draw_text(get_sky_icon(weather),       3, image_draw, display_size, use_icon_font=True, debug=debug)
+    draw_text(get_high_temp_copy(weather), 1, image_draw, display_size, debug=debug)
+    draw_text(get_low_temp_copy(weather),  4, image_draw, display_size, debug=debug)
 
     if weather.is_uv_warning():
         image_draw.text(radiation_location, radiation_icon, InkyPHAT.YELLOW, font=icons_font)
