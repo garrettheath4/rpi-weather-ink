@@ -193,6 +193,7 @@ class Weather:
             else:
                 raise Exception("API request returned a not-OK status code", res.status_code, res.url)
         else:
+            print("Info: Fetching data from current forecast page instead of API since no API key was given")
             res = requests.get("https://darksky.net/forecast/{}/us12/en".format(coords_str))
             if res.status_code == 200:
                 soup = BeautifulSoup(res.content, "lxml")
