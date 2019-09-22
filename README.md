@@ -21,11 +21,11 @@ python setup.py install
 
 ## Running
 
-Just run the `ink-display.py` script to refresh the e-ink display.
+Just run the `weatherink.py` script to refresh the e-ink display.
 
 ```
 cd rpi-weather-ink/
-./ink-display.py
+./weatherink.py
 ```
 
 ## Development
@@ -35,7 +35,7 @@ cd rpi-weather-ink/
 ```
 sudo pip install pipenv
 pipenv install <python-package>
-pipenv run python ink-display.py
+pipenv run python weatherink.py
 pipenv lock -r > requirements.txt
 sudo pip install -r requirements.txt
 ```
