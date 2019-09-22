@@ -85,10 +85,12 @@ def main():
     for x in range(0, inky_display.width):
         img.putpixel((x, inky_display.height / 2), inky_display.BLACK)
 
-    draw_text(get_uv(),             2, img, display_size)
-    draw_text(get_cloudiness(True), 3, img, display_size, font_awesome=True)
-    draw_text(get_high_temp_copy(), 1, img, display_size)
-    draw_text(get_low_temp_copy(),  4, img, display_size)
+    weather = Weather(location_coords)
+
+    draw_text(weather.uv_index_int(),      2, img, display_size)
+    draw_text(get_sky_icon(weather),       3, img, display_size, font_awesome=True)
+    draw_text(get_high_temp_copy(weather), 1, img, display_size)
+    draw_text(get_low_temp_copy(weather),  4, img, display_size)
 
     inky_display.set_image(img)
     inky_display.show()
@@ -126,56 +128,72 @@ def draw_text(text, quadrant, image, display_size, font_awesome=False):
     ImageDraw.Draw(image).text((text_x, text_y), text_str, InkyPHAT.BLACK, font=draw_font)
 
 
-def get_uv():
-    return random.randint(3, 9)
-
-
-def get_cloudiness(font_awesome=False):
-    if font_awesome:
-        return random.choice([
-            u"\uf185",  # sun
-            u"\uf0c2",  # cloud
-            u"\uf73d",  # cloud-rain
-        ])
+def get_sky_icon(weather):
+    sun_icon   = u"\uf185"
+    cloud_icon = u"\uf0c2"
+    rain_icon  = u"\uf73d"
+    question_icon = u"\uf128"
+    icons = {
+                "clear-day": sun_icon,
+                "clear-night": sun_icon,
+                "partly-cloudy-day": cloud_icon,
+                "partly-cloudy-night": cloud_icon,
+                "cloudy": cloud_icon,
+                "rain": rain_icon,
+                "sleet": rain_icon,
+                "snow": rain_icon,
+                "wind": sun_icon,
+                "fog": cloud_icon,
+            }
+    if weather.summary_text() in icons:
+        return icons[weather.summary_text()]
     else:
-        return random.choice([u"Sunny", u"Cloudy", u"Rain"])
+        return question_icon
 
 
-def get_high_temp():
-    return random.randint(80, 90)
+def get_high_temp_copy(weather):
+    return str(weather.high_temp_int()) + temp_unit
 
 
-def get_high_temp_copy():
-    return str(get_high_temp()) + temp_unit
+def get_low_temp_copy(weather):
+    return str(weather.low_temp_int()) + temp_unit
 
 
-def get_low_temp():
-    return random.randint(60, 70)
+class Weather:
+    def __init__(self, coords):
+        self.weather = {}
+        res = requests.get("https://darksky.net/forecast/{}/us12/en".format(",".join([str(c) for c in coords])))
+        if res.status_code == 200:
+            soup = BeautifulSoup(res.content, "lxml")
+            curr = soup.find("span", "currently")
+            self.weather["summary"] = curr.img["alt"].split()[0]
+            self.weather["current-temp"] = int(curr.find("span", "summary").text.split()[0][:-1])
+            high_low = curr.find("span", { "class": "summary-high-low" })
+            self.weather["feels-like"] = int(high_low.find("span", { "class": "feels-like-text" }).text[:-1])
+            self.weather["low-temp"]   = int(high_low.find("span", { "class": "low-temp-text" }).text[:-1])
+            self.weather["high-temp"]  = int(high_low.find("span", { "class": "high-temp-text" }).text[:-1])
+            self.weather["uv-index"] = int(soup.find(id="currentDetails") \
+                .find("div", { "class": "uv_index" }) \
+                .find("span", { "class": "uv__index__value" }) \
+                .text)
 
+    def summary_text(self):
+        return self.weather["summary"]
 
-def get_low_temp_copy():
-    return str(get_low_temp()) + temp_unit
+    def current_temp_int(self):
+        return self.weather["current-temp"]
 
+    def feels_like_int(self):
+        return self.weather["feels-like"]
 
-def get_weather():
-    weather = {}
-    res = requests.get("https://darksky.net/forecast/{}/us12/en".format(",".join([str(c) for c in location_coords])))
-    if res.status_code == 200:
-        soup = BeautifulSoup(res.content, "lxml")
-        curr = soup.find("span", "currently")
-        weather["summary"] = curr.img["alt"].split()[0]
-        weather["current-temp"] = int(curr.find("span", "summary").text.split()[0][:-1])
-        high_low = curr.find("span", { "class": "summary-high-low" })
-        weather["feels-like"] = int(high_low.find("span", { "class": "feels-like-text" }).text[:-1])
-        weather["low-temp"]   = int(high_low.find("span", { "class": "low-temp-text" }).text[:-1])
-        weather["high-temp"]  = int(high_low.find("span", { "class": "high-temp-text" }).text[:-1])
-        weather["uv"] = int(soup.find(id="currentDetails") \
-            .find("div", { "class": "uv_index" }) \
-            .find("span", { "class": "uv__index__value" }) \
-            .text)
-        return weather
-    else:
-        return weather
+    def low_temp_int(self):
+        return self.weather["low-temp"]
+
+    def high_temp_int(self):
+        return self.weather["high-temp"]
+
+    def uv_index_int(self):
+        return self.weather["uv-index"]
 
 
 if __name__ == "__main__":
