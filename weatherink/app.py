@@ -1,42 +1,45 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import os.path
 import ConfigParser
 
 try:
     from PIL import Image, ImageFont, ImageDraw
 except ImportError:
     Image, ImageFont, ImageDraw = None, None, None
-    exit("This package requires PIL/Pillow to be installed\nInstall it with: sudo apt install python-pil")
+    exit("This package requires PIL/Pillow to be installed. Install it with: sudo apt install python-pil")
 
 # Transitive dependencies of Inky library
 try:
     import spidev
 except ImportError:
-    print("The inky library probably requires the spidev module\n"
+    print("Warning: The inky library probably requires the spidev module. "
           + "If this package fails to run, install spidev with pipenv install --system")
 try:
     import smbus2
 except ImportError:
-    print("The inky library probably requires the smbus2 module\n"
+    print("Warning: The inky library probably requires the smbus2 module. "
           + "If this package fails to run, install smbus2 with pipenv install --system")
 try:
     import RPi.GPIO
 except ImportError:
-    print("The inky library probably requires the RPi.GPIO module\n"
+    print("Warning: The inky library probably requires the RPi.GPIO module. "
           + "If this package fails to run, install RPi.GPIO with sudo apt install python-rpi.gpio")
 try:
     import numpy
 except ImportError:
-    print("The inky library probably requires the numpy module\n"
+    print("Warning: The inky library probably requires the numpy module. "
           + "If this package fails to run, install numpy with sudo apt install python-numpy")
 
 try:
     from inky import InkyPHAT
 except ImportError:
     from tests.mock import InkyPHAT
-    exit("This package requires the inky module\nInstall it with sudo pip install inky")
+    if os.path.exists("/sys/firmware/devicetree/base/model"):
+        print("Warning: This package requires the inky module. Install it with sudo pip install inky")
 
+# Modules from this project
 from weatherink.fetch.weather import Weather
 
 # User settings
@@ -48,12 +51,13 @@ text_font_filename = "resources/Ubuntu-Regular.ttf"
 icons_font_filename = "resources/Font Awesome 5 Free-Solid-900.otf"
 
 # phat-specific (as opposed to what-specific)
-COLOR = "yellow"
-font_size = 38
+COLOR = "red"
+font_size = 40
 scale_size = 1
 temp_unit = u"\u00B0F"  # degree F
 padding = 10
 left_nudge = 20
+up_text_nudge = 5
 radiation_icon = u"\uf7ba"
 radiation_location = (75 - left_nudge, 6)
 
@@ -79,9 +83,10 @@ def run():
     display_size = (InkyPHAT.WIDTH, InkyPHAT.HEIGHT)
 
     # inky_display.set_rotation(180)
-    inky_display.set_border(InkyPHAT.YELLOW)
+    inky_display.set_border(InkyPHAT.RED)
 
-    img = Image.new("P", display_size)
+    img = Image.new("P", display_size, color=(255 if debug else 0))
+    palletize(img)
     image_draw = ImageDraw.Draw(img)
 
     weather = Weather(location_coords)
@@ -92,10 +97,17 @@ def run():
     draw_text(get_low_temp_copy(weather),  4, image_draw, display_size, debug=debug)
 
     if weather.is_uv_warning():
-        image_draw.text(radiation_location, radiation_icon, InkyPHAT.YELLOW, font=icons_font)
+        image_draw.text(radiation_location, radiation_icon, InkyPHAT.RED, font=icons_font)
 
     inky_display.set_image(img)
     inky_display.show()
+
+
+def palletize(image):
+    black = [0, 0, 0]
+    white = [255, 255, 255]
+    red = [255, 0, 0]
+    image.putpalette((white + black + red) * 85 + white)
 
 
 def draw_text(text, quadrant, image_draw, display_size, use_icon_font=False, debug=False):
@@ -127,7 +139,10 @@ def draw_text(text, quadrant, image_draw, display_size, use_icon_font=False, deb
     if quadrant in (3, 4):
         text_y += display_height / 2
 
-    image_draw.text((text_x, text_y), text_str, InkyPHAT.BLACK, font=draw_font)
+    if use_icon_font:
+        image_draw.text((text_x, text_y), text_str, InkyPHAT.BLACK, font=draw_font)
+    else:
+        image_draw.text((text_x, text_y - up_text_nudge), text_str, InkyPHAT.BLACK, font=draw_font)
 
     if debug:
         image_draw.rectangle([(text_x, text_y), (text_x + text_w, text_y + text_h)],

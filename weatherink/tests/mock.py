@@ -1,8 +1,13 @@
+import os.path
+
+IS_RASPI = os.path.exists("/sys/firmware/devicetree/base/model")
+
+
 class InkyPHAT:
     WIDTH = 212
     HEIGHT = 104
     BLACK = 1
-    RED = 1
+    RED = 2
     YELLOW = 2
 
     def __init__(self, color):
@@ -20,9 +25,10 @@ class InkyPHAT:
     def set_image(self, image):
         self.image = image
 
-    @staticmethod
-    def show():
+    def show(self):
         print("Warning: InkyPhat().show() is mocked/fake")
+        if self.image:
+            self.image.show()
         pass
 
 

@@ -8,18 +8,18 @@ try:
     import requests
 except ImportError:
     requests = None
-    exit("This package requires the requests module\nInstall it with pipenv install --system")
+    exit("This package requires the requests module. Install it with pipenv install --system")
 
 try:
     from bs4 import BeautifulSoup
 except ImportError:
     from weatherink.tests.mock import BeautifulSoup
-    exit("This package requires the BeautifulSoup module\nInstall it with pipenv install --system")
+    exit("This package requires the BeautifulSoup module. Install it with pipenv install --system")
 
 try:
     import lxml
 except ImportError:
-    print("The BeautifulSoup library probably requires the lxml module\n"
+    print("The BeautifulSoup library probably requires the lxml module. "
           + "If this script fails, install lxml with sudo apt install python-lxml")
 
 
