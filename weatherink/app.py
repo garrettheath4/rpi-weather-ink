@@ -110,13 +110,14 @@ def draw_text(text, quadrant, image, display_size, use_icon_font=False):
     else:
         draw_font = text_font
 
-    _, font_height = draw_font.getsize(text)
-
-    display_width, display_height = display_size
-
     text_str = text
     if type(text) not in (unicode, str):
         text_str = str(text)
+
+    _, font_height = draw_font.getsize(text_str)
+
+    display_width, display_height = display_size
+
 
     text_w, text_h = draw_font.getsize(text_str)
     text_x = int(max((display_width / 2) - text_w, 0))
