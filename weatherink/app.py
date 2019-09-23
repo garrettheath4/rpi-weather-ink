@@ -89,6 +89,15 @@ def run():
     palletize(img)
     image_draw = ImageDraw.Draw(img)
 
+    if debug:
+        # Draw vertical line
+        for y in xrange(InkyPHAT.HEIGHT):
+            img.putpixel((InkyPHAT.WIDTH / 2, y), inky_display.RED)
+
+        # Draw horizontal line
+        for x in xrange(InkyPHAT.WIDTH):
+            img.putpixel((x, InkyPHAT.HEIGHT / 2), inky_display.RED)
+
     weather = Weather(location_coords)
 
     draw_text(weather.uv_index,            2, image_draw, display_size, debug=debug)
@@ -123,9 +132,9 @@ def draw_text(text, quadrant, image_draw, display_size, align="c", use_icon_font
     display_width, display_height = display_size
     text_w, text_h = draw_font.getsize(text_str)
 
-    text_x = int(max((display_width / 2) - text_w, padding))
+    # Center in quadrant by default
+    text_x = int(max((display_width / 2) - text_w, padding) / 2)
     if quadrant in (1, 4):
-        # Right-align
         text_x += display_width / 2 - padding
     else:
         # Center and then nudge left
@@ -143,7 +152,7 @@ def draw_text(text, quadrant, image_draw, display_size, align="c", use_icon_font
     if debug:
         image_draw.rectangle([(text_x, text_y), (text_x + text_w, text_y + text_h)],
                              outline=InkyPHAT.RED,
-                             width=2)
+                             width=1)
 
 
 def get_sky_icon(weather):
