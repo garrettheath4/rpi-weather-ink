@@ -111,16 +111,24 @@ def run():
             print("Updating display since the forecast has changed since the last render")
         weather.save_temp_forecast()
 
-    draw_text(image_draw, 2, weather.uv_index,            "l")
-    draw_text(image_draw, 3, get_sky_icon(weather),       "c", True)
+    draw_text(image_draw, 2, "UV",                        "l")
+    draw_text(image_draw, 2, weather.uv_index,            "r",
+              color=InkyPHAT.RED if weather.is_uv_warning() else InkyPHAT.BLACK)
     draw_text(image_draw, 1, get_high_temp_copy(weather), "c")
     draw_text(image_draw, 4, get_low_temp_copy(weather),  "c")
 
-    if weather.is_uv_warning():
-        draw_text(image_draw, 2, radiation_icon, "r", True, InkyPHAT.RED)
+    if weather.precipitation_is_likely():
+        precip_chance_str = str(int(round(weather.current_precip_probability * 100))) + "%"
+        draw_text(image_draw, 3, get_sky_icon(weather), "l", is_icon=True)
+        draw_text(image_draw, 3, precip_chance_str,     "r", is_icon=False)
+    else:
+        draw_text(image_draw, 3, get_sky_icon(weather), "c", is_icon=True)
 
     inky_display.set_image(img)
     inky_display.show()
+
+    if DEBUG:
+        print(weather.eink_data_string())
 
 
 def palletize(image):
@@ -131,12 +139,12 @@ def palletize(image):
     image.putpalette(white + black + red + out_of_bounds_blue * 253)
 
 
-def draw_text(image_draw, quadrant, text, align="c", use_icon_font=False, color=InkyPHAT.BLACK):
+def draw_text(image_draw, quadrant, text, align="c", is_icon=False, color=InkyPHAT.BLACK):
     text_str = text
     if type(text) not in (unicode, str):
         text_str = str(text)
 
-    if use_icon_font:
+    if is_icon:
         draw_font = icons_font
     else:
         draw_font = text_font
@@ -159,7 +167,7 @@ def draw_text(image_draw, quadrant, text, align="c", use_icon_font=False, color=
     if quadrant in (3, 4):
         text_y += InkyPHAT.HEIGHT / 2
 
-    if use_icon_font:
+    if is_icon:
         image_draw.text((text_x, text_y), text_str, color, font=draw_font)
     else:
         image_draw.text((text_x, text_y - up_text_nudge), text_str, color, font=draw_font)

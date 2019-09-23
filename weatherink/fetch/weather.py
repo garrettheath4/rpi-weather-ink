@@ -30,11 +30,12 @@ temporary_file_path = "/tmp/weatherink-forecast-cache.txt"
 class Weather:
     secrets_filename = "resources/secrets.ini"
 
-    def __init__(self, coords, query_api=True, uv_warning_threshold=6):
+    def __init__(self, coords, query_api=True, uv_warning_threshold=6, precipitation_threshold=0.5):
         self.coords = coords
         self._coords_str = ",".join([str(c) for c in coords])
         self.query_api = query_api
-        self._uv_warning_threshold = uv_warning_threshold
+        self.uv_warning_threshold = uv_warning_threshold
+        self.precipitation_warning_threshold = precipitation_threshold
 
         # Create fields for weather data
         self.summary_key = None
@@ -67,7 +68,7 @@ class Weather:
                                .format(self._api_key, self._coords_str))
             if res.status_code == 200:
                 res_json = json.loads(res.content)
-                self.summary_key = res_json["daily"]["icon"]
+                self.summary_key = res_json["daily"]["data"][0]["icon"]
                 self.current_temp = int(round(res_json["currently"]["temperature"]))
                 self.feels_like = int(round(res_json["currently"]["apparentTemperature"]))
                 self.low_temp = int(round(res_json["daily"]["data"][0]["temperatureLow"]))
@@ -97,12 +98,17 @@ class Weather:
                 raise Exception("UI request returned a not-OK status code", res.status_code, res.url)
 
     def is_uv_warning(self):
-        return self.uv_index >= self._uv_warning_threshold
+        return self.uv_index >= self.uv_warning_threshold
 
-    def display_data_string(self):
-        return "{}|{}|low:{}|high:{}|uv:{}\n"\
+    def precipitation_is_likely(self):
+        return self.current_precip_probability \
+               and self.current_precip_probability >= self.precipitation_warning_threshold
+
+    def eink_data_string(self):
+        return "{}|{}|pop:{}|low:{}|high:{}|uv:{}\n"\
             .format(self._coords_str,
                     self.summary_key,
+                    self.current_precip_probability,
                     self.low_temp,
                     self.high_temp,
                     self.uv_index,
@@ -112,11 +118,11 @@ class Weather:
         if only_if_no_such_file and os.path.exists(temporary_file_path):
             return
         with open(temporary_file_path, "w") as tmp:
-            tmp.write(self.display_data_string())
+            tmp.write(self.eink_data_string())
 
     def is_same_as_temp_data(self):
         if not os.path.exists(temporary_file_path):
             return False
         with open(temporary_file_path, "r") as tmp:
-            return tmp.readline() == self.display_data_string()
+            return tmp.readline() == self.eink_data_string()
 
