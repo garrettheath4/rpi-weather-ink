@@ -43,6 +43,7 @@ class Weather:
         self.low_temp = None
         self.high_temp = None
         self.uv_index = None
+        self.current_precip_probability = None
 
         # Fetch weather data
         self._api_key = None
@@ -72,6 +73,7 @@ class Weather:
                 self.low_temp = int(round(res_json["daily"]["data"][0]["temperatureLow"]))
                 self.high_temp = int(round(res_json["daily"]["data"][0]["temperatureHigh"]))
                 self.uv_index = int(res_json["daily"]["data"][0]["uvIndex"])
+                self.current_precip_probability = float(res_json["currently"]["precipProbability"])
             else:
                 raise Exception("API request returned a not-OK status code", res.status_code, res.url)
         else:
@@ -97,12 +99,10 @@ class Weather:
     def is_uv_warning(self):
         return self.uv_index >= self._uv_warning_threshold
 
-    def __str__(self):
-        return "{}|{}|curr:{}|feels:{}|low:{}|high:{}|uv:{}\n"\
+    def display_data_string(self):
+        return "{}|{}|low:{}|high:{}|uv:{}\n"\
             .format(self._coords_str,
                     self.summary_key,
-                    self.current_temp,
-                    self.feels_like,
                     self.low_temp,
                     self.high_temp,
                     self.uv_index,
@@ -112,11 +112,11 @@ class Weather:
         if only_if_no_such_file and os.path.exists(temporary_file_path):
             return
         with open(temporary_file_path, "w") as tmp:
-            tmp.write(str(self))
+            tmp.write(self.display_data_string())
 
     def is_same_as_temp_data(self):
         if not os.path.exists(temporary_file_path):
             return False
         with open(temporary_file_path, "r") as tmp:
-            return tmp.readline() == str(self)
+            return tmp.readline() == self.display_data_string()
 
