@@ -55,7 +55,6 @@ COLOR = "red"
 font_size = 40
 scale_size = 1
 temp_unit = u"\u00B0F"  # degree F
-padding = 10
 left_nudge = 20
 up_text_nudge = 4
 radiation_icon = u"\uf7ba"
@@ -76,23 +75,25 @@ def get_debug_from_config():
         return False
 
 
+DEBUG = get_debug_from_config()
+
+
 def run():
-    debug = get_debug_from_config()
 
     inky_display = InkyPHAT(COLOR)
-    display_size = (InkyPHAT.WIDTH, InkyPHAT.HEIGHT)
 
     # inky_display.set_rotation(180)
     inky_display.set_border(InkyPHAT.RED)
 
-    img = Image.new("P", display_size)
+    img = Image.new("P", (InkyPHAT.WIDTH, InkyPHAT.HEIGHT))
     palletize(img)
     image_draw = ImageDraw.Draw(img)
 
-    if debug:
+    if DEBUG:
         # Draw vertical line
         for y in xrange(InkyPHAT.HEIGHT):
             img.putpixel((InkyPHAT.WIDTH / 2, y), inky_display.RED)
+            img.putpixel((InkyPHAT.WIDTH / 4, y), inky_display.RED)
 
         # Draw horizontal line
         for x in xrange(InkyPHAT.WIDTH):
@@ -100,13 +101,13 @@ def run():
 
     weather = Weather(location_coords)
 
-    draw_text(weather.uv_index,            2, image_draw, display_size, debug=debug)
-    draw_text(get_sky_icon(weather),       3, image_draw, display_size, use_icon_font=True, debug=debug)
-    draw_text(get_high_temp_copy(weather), 1, image_draw, display_size, debug=debug)
-    draw_text(get_low_temp_copy(weather),  4, image_draw, display_size, debug=debug)
+    draw_text(image_draw, 2, weather.uv_index,            "l")
+    draw_text(image_draw, 3, get_sky_icon(weather),       "l", True)
+    draw_text(image_draw, 1, get_high_temp_copy(weather), "c")
+    draw_text(image_draw, 4, get_low_temp_copy(weather),  "c")
 
     if weather.is_uv_warning():
-        image_draw.text(radiation_location, radiation_icon, InkyPHAT.RED, font=icons_font)
+        draw_text(image_draw, 2, radiation_icon, "r", True)
 
     inky_display.set_image(img)
     inky_display.show()
@@ -120,7 +121,7 @@ def palletize(image):
     image.putpalette(white + black + red + out_of_bounds_blue * 253)
 
 
-def draw_text(text, quadrant, image_draw, display_size, align="c", use_icon_font=False, debug=False):
+def draw_text(image_draw, quadrant, text, align="c", use_icon_font=False):
     text_str = text
     if type(text) not in (unicode, str):
         text_str = str(text)
@@ -130,34 +131,30 @@ def draw_text(text, quadrant, image_draw, display_size, align="c", use_icon_font
     else:
         draw_font = text_font
 
-    display_width, display_height = display_size
     text_w, text_h = draw_font.getsize(text_str)
 
     if align.lower().startswith("l"):
         # Left align in left quadrant
-        text_x = int(max(0, padding))
+        text_x = int((InkyPHAT.WIDTH / 2 - text_w) / 2)
     elif align.lower().startswith("r"):
         # Right align in left quadrant
-        text_x = int(display_width / 2 - text_w)
+        text_x = int(InkyPHAT.WIDTH / 2 - text_w)
     else:
         # Center in left quadrant by default
-        text_x = int((display_width / 2 - text_w) / 2)
+        text_x = int((InkyPHAT.WIDTH / 2 - text_w) / 2)
     if quadrant in (1, 4):
-        text_x += display_width / 2
-    else:
-        # Center and then nudge left
-        text_x -= left_nudge
+        text_x += InkyPHAT.WIDTH / 2
 
-    text_y = int(max((display_height / 2) - text_h, 0) / 2)
+    text_y = int(max((InkyPHAT.HEIGHT / 2) - text_h, 0) / 2)
     if quadrant in (3, 4):
-        text_y += display_height / 2
+        text_y += InkyPHAT.HEIGHT / 2
 
     if use_icon_font:
         image_draw.text((text_x, text_y), text_str, InkyPHAT.BLACK, font=draw_font)
     else:
         image_draw.text((text_x, text_y - up_text_nudge), text_str, InkyPHAT.BLACK, font=draw_font)
 
-    if debug:
+    if DEBUG:
         image_draw.rectangle([(text_x, text_y), (text_x + text_w, text_y + text_h)],
                              outline=InkyPHAT.RED,
                              width=1)
