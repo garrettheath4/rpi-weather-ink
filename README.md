@@ -8,16 +8,27 @@ up-to-date weather forecast including the UV index of the day.
 
 ## Installation
 
-```
-sudo apt install python-pil python-rpi.gpio python-numpy python-lxml
-cd rpi-weather-ink/
-pipenv install --system
-```
+1. Install [Raspbian](https://www.raspberrypi.org/downloads/raspbian/) on a
+   Raspberry Pi Zero WH (or similar Raspberry Pi model)
+2. Connect the Pimoroni Inky pHAT to the headers on the Raspbery Pi
+3. Update the software and install Git and a few required system libraries:
+
+        sudp apt update && sudo apt upgrade
+        sudo apt install git python-pil python-rpi.gpio python-numpy python-lxml
+
+4. Clone this repository and install the required Python libraries:
+
+        git clone https://github.com/garrettheath4/rpi-weather-ink.git
+        cd rpi-weather-ink/
+        pipenv install --system
+
+### Dark Sky API Key
 
 If you want to use the Dark Sky API to fetch more accurate forecast data, you'll
 need to put the Dark Sky API key in a `secrets.ini` file in the `resources/`
-folder of this project (the `rpi-weather-ink/` directory). The file should be
-formatted like this:
+folder of this project (the `rpi-weather-ink/` directory). If you do not provide
+an API key, only partial forecast data can be fetched by scraping the Dark Sky
+forecast web page. The _secrets_ file should be formatted like this:
 
 ```
 [DarkSky]
