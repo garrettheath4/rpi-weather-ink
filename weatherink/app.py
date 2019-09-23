@@ -40,7 +40,7 @@ except ImportError:
         print("Warning: This package requires the inky module. Install it with sudo pip install inky")
 
 # Modules from this project
-from weatherink.fetch.weather import Weather
+from forecast import Weather
 
 # User settings
 location_coords = [38.928766, -77.032645]
