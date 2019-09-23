@@ -73,6 +73,7 @@ the screen every 5 minutes.
 
 ## Future Work
 
+- [ ] Add code to center an icon at a specific X,Y coordinate on the screen
 - [ ] Show sunglasses icon if it's sunny _right now_ (current UV index is high
       instead of daily UV index)
 - [ ] Show "unplugged" icon if it's offline or unable to reach Dark Sky
