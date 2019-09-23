@@ -62,11 +62,11 @@ the screen every 5 minutes.
 - Uses [Ubuntu](https://design.ubuntu.com/font/) open-source font for text
 - Displays warning icon if daily UV index is high (6 or higher by default)
 - Refreshes weather data every 5 minutes
+- Only re-render e-ink screen if data has changed since previous render
 
 
 ## Future Work
 
-- [ ] Only re-render e-ink screen if data has changed since previous render
 - [ ] Show sunglasses icon if it's sunny _right now_ (current UV index is high
       instead of daily UV index)
 - [ ] Show chance of precipitation next to the sky icon

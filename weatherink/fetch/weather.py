@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import os.path
 import ConfigParser
 import json
 
@@ -21,6 +22,9 @@ try:
 except ImportError:
     print("The BeautifulSoup library probably requires the lxml module. "
           + "If this script fails, install lxml with sudo apt install python-lxml")
+
+
+temporary_file_path = "/tmp/weatherink-forecast-cache.txt"
 
 
 class Weather:
@@ -92,3 +96,27 @@ class Weather:
 
     def is_uv_warning(self):
         return self.uv_index >= self._uv_warning_threshold
+
+    def __str__(self):
+        return "{}|{}|curr:{}|feels:{}|low:{}|high:{}|uv:{}\n"\
+            .format(self._coords_str,
+                    self.summary_key,
+                    self.current_temp,
+                    self.feels_like,
+                    self.low_temp,
+                    self.high_temp,
+                    self.uv_index,
+                    )
+
+    def save_temp_forecast(self, only_if_no_such_file=False):
+        if only_if_no_such_file and os.path.exists(temporary_file_path):
+            return
+        with open(temporary_file_path, "w") as tmp:
+            tmp.write(str(self))
+
+    def is_same_as_temp_data(self):
+        if not os.path.exists(temporary_file_path):
+            return False
+        with open(temporary_file_path, "r") as tmp:
+            return tmp.readline() == str(self)
+

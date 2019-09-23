@@ -47,8 +47,8 @@ location_coords = [38.928766, -77.032645]
 configuration_filename = "resources/application.ini"
 
 # App resources
-text_font_filename = "resources/Ubuntu-Regular.ttf"
-icons_font_filename = "resources/Font Awesome 5 Free-Solid-900.otf"
+text_font_path = "resources/Ubuntu-Regular.ttf"
+icons_font_path = "resources/Font Awesome 5 Free-Solid-900.otf"
 
 # phat-specific (as opposed to what-specific)
 COLOR = "red"
@@ -60,8 +60,8 @@ up_text_nudge = 4
 radiation_icon = u"\uf7ba"
 radiation_location = (75 - left_nudge, 6)
 
-icons_font = ImageFont.truetype(icons_font_filename, int(font_size * scale_size))
-text_font = ImageFont.truetype(text_font_filename, int(font_size * scale_size))
+icons_font = ImageFont.truetype(icons_font_path, int(font_size * scale_size))
+text_font = ImageFont.truetype(text_font_path, int(font_size * scale_size))
 
 
 def get_debug_from_config():
@@ -100,6 +100,16 @@ def run():
             img.putpixel((x, InkyPHAT.HEIGHT / 2), inky_display.RED)
 
     weather = Weather(location_coords)
+
+    if weather.is_same_as_temp_data():
+        if DEBUG:
+            print("Not updating the display since the forecast is the same as last time")
+        weather.save_temp_forecast(only_if_no_such_file=True)
+        return
+    else:
+        if DEBUG:
+            print("Updating display since the forecast has changed since the last render")
+        weather.save_temp_forecast()
 
     draw_text(image_draw, 2, weather.uv_index,            "l")
     draw_text(image_draw, 3, get_sky_icon(weather),       "c", True)
