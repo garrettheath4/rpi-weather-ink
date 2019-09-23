@@ -85,7 +85,7 @@ def run():
     # inky_display.set_rotation(180)
     inky_display.set_border(InkyPHAT.RED)
 
-    img = Image.new("P", display_size, color=(255 if debug else 0))
+    img = Image.new("P", display_size)
     palletize(img)
     image_draw = ImageDraw.Draw(img)
 
@@ -113,10 +113,11 @@ def run():
 
 
 def palletize(image):
-    black = [0, 0, 0]
     white = [255, 255, 255]
+    black = [0, 0, 0]
     red = [255, 0, 0]
-    image.putpalette((white + black + red) * 85 + white)
+    out_of_bounds_blue = [0, 0, 255]
+    image.putpalette(white + black + red + out_of_bounds_blue * 253)
 
 
 def draw_text(text, quadrant, image_draw, display_size, align="c", use_icon_font=False, debug=False):
