@@ -3,12 +3,7 @@
 The purpose of this project is to have a digital display to always show an
 up-to-date weather forecast including the UV index of the day.
 
-```
-+----------|----------+
-| UV Index | Hi  Temp |
-| Cloudy   | Low Temp |
-+----------|----------+
-```
+![Demo of e-ink display](example.png?raw=true)
 
 
 ## Installation
