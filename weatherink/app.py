@@ -133,14 +133,21 @@ def draw_text(text, quadrant, image_draw, display_size, align="c", use_icon_font
     display_width, display_height = display_size
     text_w, text_h = draw_font.getsize(text_str)
 
-    # Center in quadrant by default
-    text_x = int(max((display_width / 2) - text_w, padding) / 2)
+    if align.lower().startswith("l"):
+        # Left align in left quadrant
+        text_x = int(max(0, padding))
+    elif align.lower().startswith("r"):
+        # Right align in left quadrant
+        text_x = int(display_width / 2 - text_w)
+    else:
+        # Center in left quadrant by default
+        text_x = int((display_width / 2 - text_w) / 2)
     if quadrant in (1, 4):
-        text_x += display_width / 2 - padding
+        text_x += display_width / 2
     else:
         # Center and then nudge left
-        text_x /= 2
-        text_x += padding - left_nudge
+        text_x -= left_nudge
+
     text_y = int(max((display_height / 2) - text_h, 0) / 2)
     if quadrant in (3, 4):
         text_y += display_height / 2
