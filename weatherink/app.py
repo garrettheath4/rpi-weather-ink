@@ -102,12 +102,12 @@ def run():
     weather = Weather(location_coords)
 
     draw_text(image_draw, 2, weather.uv_index,            "l")
-    draw_text(image_draw, 3, get_sky_icon(weather),       "l", True)
+    draw_text(image_draw, 3, get_sky_icon(weather),       "c", True)
     draw_text(image_draw, 1, get_high_temp_copy(weather), "c")
     draw_text(image_draw, 4, get_low_temp_copy(weather),  "c")
 
     if weather.is_uv_warning():
-        draw_text(image_draw, 2, radiation_icon, "r", True)
+        draw_text(image_draw, 2, radiation_icon, "r", True, InkyPHAT.RED)
 
     inky_display.set_image(img)
     inky_display.show()
@@ -121,7 +121,7 @@ def palletize(image):
     image.putpalette(white + black + red + out_of_bounds_blue * 253)
 
 
-def draw_text(image_draw, quadrant, text, align="c", use_icon_font=False):
+def draw_text(image_draw, quadrant, text, align="c", use_icon_font=False, color=InkyPHAT.BLACK):
     text_str = text
     if type(text) not in (unicode, str):
         text_str = str(text)
@@ -134,11 +134,11 @@ def draw_text(image_draw, quadrant, text, align="c", use_icon_font=False):
     text_w, text_h = draw_font.getsize(text_str)
 
     if align.lower().startswith("l"):
-        # Left align in left quadrant
-        text_x = int((InkyPHAT.WIDTH / 2 - text_w) / 2)
+        # Center in the LEFT half of the left quadrant
+        text_x = int((InkyPHAT.WIDTH / 4 - text_w) / 2)
     elif align.lower().startswith("r"):
-        # Right align in left quadrant
-        text_x = int(InkyPHAT.WIDTH / 2 - text_w)
+        # Center in the RIGHT half of the left quadrant
+        text_x = int((InkyPHAT.WIDTH / 4 - text_w) / 2 + InkyPHAT.WIDTH / 4)
     else:
         # Center in left quadrant by default
         text_x = int((InkyPHAT.WIDTH / 2 - text_w) / 2)
@@ -150,9 +150,9 @@ def draw_text(image_draw, quadrant, text, align="c", use_icon_font=False):
         text_y += InkyPHAT.HEIGHT / 2
 
     if use_icon_font:
-        image_draw.text((text_x, text_y), text_str, InkyPHAT.BLACK, font=draw_font)
+        image_draw.text((text_x, text_y), text_str, color, font=draw_font)
     else:
-        image_draw.text((text_x, text_y - up_text_nudge), text_str, InkyPHAT.BLACK, font=draw_font)
+        image_draw.text((text_x, text_y - up_text_nudge), text_str, color, font=draw_font)
 
     if DEBUG:
         image_draw.rectangle([(text_x, text_y), (text_x + text_w, text_y + text_h)],
