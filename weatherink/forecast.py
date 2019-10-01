@@ -30,7 +30,7 @@ temporary_file_path = "/tmp/weatherink-forecast-cache.txt"
 class Weather:
     secrets_filename = "resources/secrets.ini"
 
-    def __init__(self, coords, query_api=True, uv_warning_threshold=6, precipitation_threshold=0.5):
+    def __init__(self, coords, query_api=True, uv_warning_threshold=7, precipitation_threshold=0.5):
         self.coords = coords
         self._coords_str = ",".join([str(c) for c in coords])
         self.query_api = query_api
